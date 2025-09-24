@@ -376,419 +376,461 @@
     </div>
 
     <script>
-        // Configuration - Replace with your Google Sheets Web App URL
-        const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzOb9fGVbiDkkVsZk8Z_rO51_xsbC-GZyRJLquMwAIwwBVvU2w2LbD-VgeBXGs5-emD/exec';
+        // Configuration - Replace with your ACTUAL Google Sheets Web App URL
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzOb9fGVbiDkkVsZk8Z_rO51_xsbC-GZyRJLquMwAIwwBVvU2w2LbD-VgeBXGs5-emD/exec';
+
+// Company data (you'll customize this with your real companies)
+const companies = {
+    day1: {
+        session1: [
+            { name: "TechCorp Solutions", type: "tech", table: 1 },
+            { name: "Venture Partners", type: "vc", table: 2 },
+            { name: "AI Innovations", type: "tech", table: 3 },
+            { name: "Capital Ventures", type: "vc", table: 4 },
+            { name: "CloudTech Systems", type: "tech", table: 5 },
+            { name: "Growth Capital", type: "vc", table: 6 },
+            { name: "DataDrive Analytics", type: "tech", table: 7 },
+            { name: "Seed Investors", type: "vc", table: 8 },
+            { name: "Future Capital", type: "vc", table: 9 }
+        ],
+        session2: [
+            { name: "Blockchain Tech", type: "tech", table: 1 },
+            { name: "Angel Investors", type: "vc", table: 2 },
+            { name: "Quantum Computing Co", type: "tech", table: 3 },
+            { name: "Innovation Fund", type: "vc", table: 4 },
+            { name: "CyberSec Solutions", type: "tech", table: 5 },
+            { name: "Startup Accelerator", type: "vc", table: 6 },
+            { name: "RoboTech Industries", type: "tech", table: 7 },
+            { name: "Venture Studio", type: "vc", table: 8 },
+            { name: "Early Stage VC", type: "vc", table: 9 }
+        ]
+    },
+    day2: {
+        session1: [
+            { name: "FinTech Global", type: "tech", table: 1 },
+            { name: "Impact Ventures", type: "vc", table: 2 },
+            { name: "HealthTech Plus", type: "tech", table: 3 },
+            { name: "Series A Partners", type: "vc", table: 4 },
+            { name: "EdTech Solutions", type: "tech", table: 5 },
+            { name: "Growth Equity", type: "vc", table: 6 },
+            { name: "GreenTech Energy", type: "tech", table: 7 },
+            { name: "Venture Capital X", type: "vc", table: 8 },
+            { name: "Strategic Ventures", type: "vc", table: 9 }
+        ],
+        session2: [
+            { name: "SpaceTech Corp", type: "tech", table: 1 },
+            { name: "Future Fund", type: "vc", table: 2 },
+            { name: "BioTech Innovations", type: "tech", table: 3 },
+            { name: "Catalyst Capital", type: "vc", table: 4 },
+            { name: "AR/VR Studios", type: "tech", table: 5 },
+            { name: "Founders Fund", type: "vc", table: 6 },
+            { name: "IoT Networks", type: "tech", table: 7 },
+            { name: "Seed Capital", type: "vc", table: 8 },
+            { name: "Tech Ventures", type: "vc", table: 9 }
+        ]
+    }
+};
+
+// Bookings storage - hybrid approach
+let bookings = JSON.parse(localStorage.getItem('eventBookings')) || {};
+let isConnected = false;
+
+function updateConnectionStatus(connected, message = '') {
+    const statusElement = document.getElementById('connectionStatus');
+    const indicatorElement = document.getElementById('statusIndicator');
+    const textElement = document.getElementById('statusText');
+    
+    isConnected = connected;
+    
+    if (connected) {
+        statusElement.className = 'connection-status connected';
+        indicatorElement.className = 'status-indicator status-connected';
+        textElement.textContent = message || 'Connected to Google Sheets - Data will sync automatically';
+    } else {
+        statusElement.className = 'connection-status disconnected';
+        indicatorElement.className = 'status-indicator status-disconnected';
+        textElement.textContent = message || 'Offline mode - Data saved locally (remember to sync when online)';
+    }
+}
+
+// Save bookings - hybrid approach
+function saveBookings() {
+    // Always save locally first
+    localStorage.setItem('eventBookings', JSON.stringify(bookings));
+    
+    // Try to sync with sheets if connected
+    if (isConnected && SHEETS_URL && isValidSheetsUrl(SHEETS_URL)) {
+        syncToSheets();
+    }
+}
+
+// Check if the sheets URL is valid (not a placeholder)
+function isValidSheetsUrl(url) {
+    return url && 
+           url.startsWith('https://script.google.com/macros/s/') && 
+           !url.includes('AKfycbwT4YiAC5AkWGm7nzsU9VWrfmbByIwoVQNRF8DXShJyK6uv14nFxeT3h8QzYd_XFnMQ') && // old placeholder
+           url.length > 50; // reasonable length check
+}
+
+// Sync to Google Sheets
+async function syncToSheets() {
+    if (!isValidSheetsUrl(SHEETS_URL)) {
+        console.log('Invalid or placeholder Sheets URL');
+        return;
+    }
+
+    try {
+        console.log('Syncing to sheets...', SHEETS_URL);
         
-        // Company data (you'll customize this with your real companies)
-        const companies = {
-            day1: {
-                session1: [
-                    { name: "TechCorp Solutions", type: "tech", table: 1 },
-                    { name: "Venture Partners", type: "vc", table: 2 },
-                    { name: "AI Innovations", type: "tech", table: 3 },
-                    { name: "Capital Ventures", type: "vc", table: 4 },
-                    { name: "CloudTech Systems", type: "tech", table: 5 },
-                    { name: "Growth Capital", type: "vc", table: 6 },
-                    { name: "DataDrive Analytics", type: "tech", table: 7 },
-                    { name: "Seed Investors", type: "vc", table: 8 },
-                    { name: "Future Capital", type: "vc", table: 9 }
-                ],
-                session2: [
-                    { name: "Blockchain Tech", type: "tech", table: 1 },
-                    { name: "Angel Investors", type: "vc", table: 2 },
-                    { name: "Quantum Computing Co", type: "tech", table: 3 },
-                    { name: "Innovation Fund", type: "vc", table: 4 },
-                    { name: "CyberSec Solutions", type: "tech", table: 5 },
-                    { name: "Startup Accelerator", type: "vc", table: 6 },
-                    { name: "RoboTech Industries", type: "tech", table: 7 },
-                    { name: "Venture Studio", type: "vc", table: 8 },
-                    { name: "Early Stage VC", type: "vc", table: 9 }
-                ]
+        const response = await fetch(SHEETS_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
             },
-            day2: {
-                session1: [
-                    { name: "FinTech Global", type: "tech", table: 1 },
-                    { name: "Impact Ventures", type: "vc", table: 2 },
-                    { name: "HealthTech Plus", type: "tech", table: 3 },
-                    { name: "Series A Partners", type: "vc", table: 4 },
-                    { name: "EdTech Solutions", type: "tech", table: 5 },
-                    { name: "Growth Equity", type: "vc", table: 6 },
-                    { name: "GreenTech Energy", type: "tech", table: 7 },
-                    { name: "Venture Capital X", type: "vc", table: 8 },
-                    { name: "Strategic Ventures", type: "vc", table: 9 }
-                ],
-                session2: [
-                    { name: "SpaceTech Corp", type: "tech", table: 1 },
-                    { name: "Future Fund", type: "vc", table: 2 },
-                    { name: "BioTech Innovations", type: "tech", table: 3 },
-                    { name: "Catalyst Capital", type: "vc", table: 4 },
-                    { name: "AR/VR Studios", type: "tech", table: 5 },
-                    { name: "Founders Fund", type: "vc", table: 6 },
-                    { name: "IoT Networks", type: "tech", table: 7 },
-                    { name: "Seed Capital", type: "vc", table: 8 },
-                    { name: "Tech Ventures", type: "vc", table: 9 }
-                ]
+            body: JSON.stringify({
+                action: 'save',
+                data: bookings
+            })
+        });
+        
+        console.log('Sync response status:', response.status);
+        
+        if (response.ok) {
+            const result = await response.json();
+            console.log('Sync result:', result);
+            
+            if (result.success) {
+                updateConnectionStatus(true, 'Data synced to Google Sheets successfully');
+            } else {
+                throw new Error(result.message || 'Sync failed');
+            }
+        } else {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+    } catch (error) {
+        console.error('Sync error:', error);
+        updateConnectionStatus(false, `Sync failed: ${error.message}`);
+    }
+}
+
+// Load from Google Sheets
+async function loadFromSheets() {
+    if (!isValidSheetsUrl(SHEETS_URL)) {
+        alert('Please configure a valid Google Sheets URL first');
+        updateConnectionStatus(false, 'Google Sheets URL not configured');
+        return;
+    }
+
+    try {
+        console.log('Loading from sheets...', SHEETS_URL);
+        
+        // Use GET request without query parameters to avoid the undefined parameter issue
+        const response = await fetch(SHEETS_URL, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+        
+        console.log('Load response status:', response.status);
+        
+        if (response.ok) {
+            const data = await response.json();
+            console.log('Load result:', data);
+            
+            if (data.success) {
+                bookings = data.bookings || {};
+                localStorage.setItem('eventBookings', JSON.stringify(bookings)); // Save locally too
+                loadSchedule();
+                updateConnectionStatus(true, 'Data loaded from Google Sheets');
+                alert('Data synced successfully from Google Sheets!');
+            } else {
+                throw new Error(data.message || 'Load failed');
+            }
+        } else {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+    } catch (error) {
+        console.error('Load error:', error);
+        updateConnectionStatus(false, `Could not connect to Google Sheets: ${error.message}`);
+        alert(`Could not connect to Google Sheets: ${error.message}. Working with local data.`);
+    }
+}
+
+// Initialize connection
+async function initializeConnection() {
+    if (isValidSheetsUrl(SHEETS_URL)) {
+        await loadFromSheets();
+    } else {
+        updateConnectionStatus(false, 'Google Sheets not configured - using local storage only');
+        loadSchedule(); // Still load the local schedule
+    }
+}
+
+// Time slots function
+function getTimeSlots(session) {
+    if (session === 'session1') {
+        return [
+            '10:00 - 10:20',
+            '10:20 - 10:40',
+            '10:40 - 11:00',
+            '11:00 - 11:20',
+            '11:20 - 11:40',
+            '11:40 - 12:00'
+        ];
+    } else {
+        return [
+            '14:00 - 14:20',
+            '14:20 - 14:40',
+            '14:40 - 15:00',
+            '15:00 - 15:20',
+            '15:20 - 15:40',
+            '15:40 - 16:00'
+        ];
+    }
+}
+
+function loadSchedule() {
+    const day = document.getElementById('daySelect').value;
+    const session = document.getElementById('sessionSelect').value;
+    const timeSlots = getTimeSlots(session);
+    const companyList = companies[day][session];
+    
+    let html = '<table>';
+    html += '<thead><tr><th>Time Slot</th>';
+    
+    companyList.forEach(company => {
+        html += `<th>Table ${company.table}</th>`;
+    });
+    html += '</tr></thead><tbody>';
+    
+    timeSlots.forEach((slot, slotIndex) => {
+        html += `<tr>`;
+        html += `<td class="time-slot">${slot}</td>`;
+        
+        companyList.forEach(company => {
+            const bookingKey = `${day}_${session}_${slotIndex}_${company.table}`;
+            const currentBookings = bookings[bookingKey] || [];
+            const availableSlots = 5 - currentBookings.length;
+            
+            html += `<td class="company-slot" onclick="openBookingModal('${day}', '${session}', ${slotIndex}, ${company.table})">`;
+            html += `<div class="company-name">${company.name}</div>`;
+            html += `<div class="company-type ${company.type}">${company.type.toUpperCase()}</div>`;
+            html += `<div class="slots-info">`;
+            if (availableSlots > 0) {
+                html += `<span class="slots-available">✓ ${availableSlots} slots available</span>`;
+            } else {
+                html += `<span class="slots-full">✗ Fully booked</span>`;
+            }
+            html += `</div>`;
+            html += `</td>`;
+        });
+        html += `</tr>`;
+    });
+    
+    html += '</tbody></table>';
+    document.getElementById('scheduleGrid').innerHTML = html;
+}
+
+function openBookingModal(day, session, slotIndex, tableNumber) {
+    const companyList = companies[day][session];
+    const company = companyList.find(c => c.table === tableNumber);
+    const timeSlots = getTimeSlots(session);
+    const bookingKey = `${day}_${session}_${slotIndex}_${tableNumber}`;
+    const currentBookings = bookings[bookingKey] || [];
+    
+    if (currentBookings.length >= 5) {
+        alert('This slot is fully booked. Please choose another time.');
+        return;
+    }
+    
+    document.getElementById('modalInfo').innerHTML = 
+        `<strong>Company:</strong> ${company.name}<br>
+         <strong>Time:</strong> ${timeSlots[slotIndex]}<br>
+         <strong>Available Spots:</strong> ${5 - currentBookings.length} of 5`;
+    
+    document.getElementById('bookingModal').style.display = 'flex';
+    document.getElementById('bookingForm').dataset.bookingKey = bookingKey;
+}
+
+function closeModal() {
+    document.getElementById('bookingModal').style.display = 'none';
+    document.getElementById('bookingForm').reset();
+}
+
+// Booking form submission
+document.getElementById('bookingForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const bookingKey = this.dataset.bookingKey;
+    
+    const booking = {
+        name: document.getElementById('studentName').value,
+        email: document.getElementById('studentEmail').value,
+        id: document.getElementById('studentId').value,
+        phone: document.getElementById('studentPhone').value,
+        timestamp: new Date().toISOString()
+    };
+    
+    if (!bookings[bookingKey]) {
+        bookings[bookingKey] = [];
+    }
+    
+    bookings[bookingKey].push(booking);
+    saveBookings(); // This will also try to sync with sheets
+    
+    alert('Booking confirmed! Data saved ' + (isConnected ? 'and synced to Google Sheets' : 'locally'));
+    closeModal();
+    loadSchedule();
+});
+
+// Admin functions
+function clearAllBookings() {
+    if (confirm('Are you sure you want to clear all bookings? This cannot be undone!')) {
+        bookings = {};
+        localStorage.removeItem('eventBookings');
+        if (isConnected) {
+            syncToSheets();
+        }
+        loadSchedule();
+        alert('All bookings cleared.');
+    }
+}
+
+function backupBookings() {
+    const backup = {
+        timestamp: new Date().toISOString(),
+        bookings: bookings,
+        companies: companies
+    };
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `startup-exchange-backup-${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+}
+
+function restoreBookings(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const data = JSON.parse(e.target.result);
+                bookings = data.bookings || data; // Handle different backup formats
+                saveBookings();
+                loadSchedule();
+                alert('Bookings restored successfully!');
+            } catch (error) {
+                alert('Error reading backup file. Please check the file format.');
             }
         };
+        reader.readAsText(file);
+    }
+}
 
-        // Bookings storage - hybrid approach
-        let bookings = JSON.parse(localStorage.getItem('eventBookings')) || {};
-        let isConnected = false;
-
-        function updateConnectionStatus(connected, message = '') {
-            const statusElement = document.getElementById('connectionStatus');
-            const indicatorElement = document.getElementById('statusIndicator');
-            const textElement = document.getElementById('statusText');
-            
-            isConnected = connected;
-            
-            if (connected) {
-                statusElement.className = 'connection-status connected';
-                indicatorElement.className = 'status-indicator status-connected';
-                textElement.textContent = message || 'Connected to Google Sheets - Data will sync automatically';
-            } else {
-                statusElement.className = 'connection-status disconnected';
-                indicatorElement.className = 'status-indicator status-disconnected';
-                textElement.textContent = message || 'Offline mode - Data saved locally (remember to sync when online)';
-            }
-        }
-
-        // Save bookings - hybrid approach
-        function saveBookings() {
-            // Always save locally first
-            localStorage.setItem('eventBookings', JSON.stringify(bookings));
-            
-            // Try to sync with sheets if connected
-            if (isConnected && SHEETS_URL && SHEETS_URL !== 'https://script.google.com/macros/s/AKfycbzOb9fGVbiDkkVsZk8Z_rO51_xsbC-GZyRJLquMwAIwwBVvU2w2LbD-VgeBXGs5-emD/exec') {
-                syncToSheets();
-            }
-        }
-
-        // Sync to Google Sheets
-        async function syncToSheets() {
-            try {
-                const response = await fetch(SHEETS_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        action: 'save',
-                        data: bookings
-                    })
-                });
-                
-                if (response.ok) {
-                    updateConnectionStatus(true, 'Data synced to Google Sheets successfully');
-                } else {
-                    throw new Error('Sync failed');
-                }
-            } catch (error) {
-                console.error('Sync error:', error);
-                updateConnectionStatus(false, 'Sync failed - working offline');
-            }
-        }
-
-        // Load from Google Sheets
-        async function loadFromSheets() {
-            if (!SHEETS_URL || SHEETS_URL === 'https://script.google.com/macros/s/AKfycbzOb9fGVbiDkkVsZk8Z_rO51_xsbC-GZyRJLquMwAIwwBVvU2w2LbD-VgeBXGs5-emD/exec') {
-                alert('Please configure Google Sheets URL first');
-                return;
-            }
-
-            try {
-                const response = await fetch(SHEETS_URL + '?action=load');
-                const data = await response.json();
-                
-                if (data.success) {
-                    bookings = data.bookings || {};
-                    saveBookings(); // Save locally too
-                    loadSchedule();
-                    updateConnectionStatus(true, 'Data loaded from Google Sheets');
-                    alert('Data synced successfully from Google Sheets!');
-                } else {
-                    throw new Error('Load failed');
-                }
-            } catch (error) {
-                console.error('Load error:', error);
-                updateConnectionStatus(false, 'Could not connect to Google Sheets');
-                alert('Could not connect to Google Sheets. Working with local data.');
-            }
-        }
-
-        // Initialize connection
-        async function initializeConnection() {
-            if (SHEETS_URL && SHEETS_URL !== 'https://script.google.com/macros/s/AKfycbwT4YiAC5AkWGm7nzsU9VWrfmbByIwoVQNRF8DXShJyK6uv14nFxeT3h8QzYd_XFnMQ/exec') {
-                await loadFromSheets();
-            } else {
-                updateConnectionStatus(false, 'Google Sheets not configured - using local storage only');
-            }
-            loadSchedule();
-        }
-
-        // Time slots function
-        function getTimeSlots(session) {
-            if (session === 'session1') {
-                return [
-                    '10:00 - 10:20',
-                    '10:20 - 10:40',
-                    '10:40 - 11:00',
-                    '11:00 - 11:20',
-                    '11:20 - 11:40',
-                    '11:40 - 12:00'
-                ];
-            } else {
-                return [
-                    '14:00 - 14:20',
-                    '14:20 - 14:40',
-                    '14:40 - 15:00',
-                    '15:00 - 15:20',
-                    '15:20 - 15:40',
-                    '15:40 - 16:00'
-                ];
-            }
-        }
-
-        function loadSchedule() {
-            const day = document.getElementById('daySelect').value;
-            const session = document.getElementById('sessionSelect').value;
-            const timeSlots = getTimeSlots(session);
+function exportSchedule() {
+    let csv = 'Day,Session,Time Slot,Company,Table,Student Name,Student Email,Student ID,Phone,Booking Time\n';
+    
+    for (const key in bookings) {
+        if (bookings[key].length > 0) {
+            const [day, session, slotIndex, tableNumber] = key.split('_');
             const companyList = companies[day][session];
-            
-            let html = '<table>';
-            html += '<thead><tr><th>Time Slot</th>';
-            
-            companyList.forEach(company => {
-                html += `<th>Table ${company.table}</th>`;
-            });
-            html += '</tr></thead><tbody>';
-            
-            timeSlots.forEach((slot, slotIndex) => {
-                html += `<tr>`;
-                html += `<td class="time-slot">${slot}</td>`;
-                
-                companyList.forEach(company => {
-                    const bookingKey = `${day}_${session}_${slotIndex}_${company.table}`;
-                    const currentBookings = bookings[bookingKey] || [];
-                    const availableSlots = 5 - currentBookings.length;
-                    
-                    html += `<td class="company-slot" onclick="openBookingModal('${day}', '${session}', ${slotIndex}, ${company.table})">`;
-                    html += `<div class="company-name">${company.name}</div>`;
-                    html += `<div class="company-type ${company.type}">${company.type.toUpperCase()}</div>`;
-                    html += `<div class="slots-info">`;
-                    if (availableSlots > 0) {
-                        html += `<span class="slots-available">✓ ${availableSlots} slots available</span>`;
-                    } else {
-                        html += `<span class="slots-full">✗ Fully booked</span>`;
-                    }
-                    html += `</div>`;
-                    html += `</td>`;
-                });
-                html += `</tr>`;
-            });
-            
-            html += '</tbody></table>';
-            document.getElementById('scheduleGrid').innerHTML = html;
-        }
-
-        function openBookingModal(day, session, slotIndex, tableNumber) {
-            const companyList = companies[day][session];
-            const company = companyList.find(c => c.table === tableNumber);
+            const company = companyList.find(c => c.table === parseInt(tableNumber));
             const timeSlots = getTimeSlots(session);
-            const bookingKey = `${day}_${session}_${slotIndex}_${tableNumber}`;
-            const currentBookings = bookings[bookingKey] || [];
             
-            if (currentBookings.length >= 5) {
-                alert('This slot is fully booked. Please choose another time.');
-                return;
-            }
-            
-            document.getElementById('modalInfo').innerHTML = 
-                `<strong>Company:</strong> ${company.name}<br>
-                 <strong>Time:</strong> ${timeSlots[slotIndex]}<br>
-                 <strong>Available Spots:</strong> ${5 - currentBookings.length} of 5`;
-            
-            document.getElementById('bookingModal').style.display = 'flex';
-            document.getElementById('bookingForm').dataset.bookingKey = bookingKey;
+            bookings[key].forEach(booking => {
+                csv += `${day},${session},${timeSlots[slotIndex]},${company.name},${tableNumber},${booking.name},${booking.email},${booking.id},${booking.phone || 'N/A'},${booking.timestamp}\n`;
+            });
         }
+    }
+    
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `startup-exchange-bookings-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+}
 
-        function closeModal() {
-            document.getElementById('bookingModal').style.display = 'none';
-            document.getElementById('bookingForm').reset();
+function viewAllBookings() {
+    let html = '<h3>All Current Bookings</h3>';
+    let totalBookings = 0;
+    
+    for (const key in bookings) {
+        if (bookings[key].length > 0) {
+            const [day, session, slotIndex, tableNumber] = key.split('_');
+            const companyList = companies[day][session];
+            const company = companyList.find(c => c.table === parseInt(tableNumber));
+            const timeSlots = getTimeSlots(session);
+            
+            html += `<div style="margin: 15px 0; padding: 15px; background: #f8f9fa; border-radius: 8px;">`;
+            html += `<strong>${company.name}</strong> - ${timeSlots[slotIndex]}<br>`;
+            html += `${day.replace('day', 'Day ')}, Session ${session.replace('session', '')}, Table ${tableNumber}<br>`;
+            html += `<strong>Students (${bookings[key].length}/5):</strong><br>`;
+            bookings[key].forEach(booking => {
+                html += `• ${booking.name} (${booking.id}) - ${booking.email}<br>`;
+                totalBookings++;
+            });
+            html += `</div>`;
         }
+    }
+    
+    if (totalBookings === 0) {
+        html += '<p>No bookings yet.</p>';
+    }
+    
+    // Create modal to show bookings
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.5); z-index: 2000; display: flex;
+        justify-content: center; align-items: center; padding: 20px;
+    `;
+    
+    const content = document.createElement('div');
+    content.style.cssText = `
+        background: white; padding: 30px; border-radius: 15px;
+        max-width: 800px; max-height: 80vh; overflow-y: auto;
+        width: 100%;
+    `;
+    
+    content.innerHTML = html + `
+        <div style="text-align: center; margin-top: 20px;">
+            <button onclick="this.closest('.modal').remove()" 
+                    style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                Close
+            </button>
+        </div>
+    `;
+    
+    modal.className = 'modal';
+    modal.appendChild(content);
+    document.body.appendChild(modal);
+}
 
-        // Booking form submission
-        document.getElementById('bookingForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const bookingKey = this.dataset.bookingKey;
-            
-            const booking = {
-                name: document.getElementById('studentName').value,
-                email: document.getElementById('studentEmail').value,
-                id: document.getElementById('studentId').value,
-                phone: document.getElementById('studentPhone').value,
-                timestamp: new Date().toISOString()
-            };
-            
-            if (!bookings[bookingKey]) {
-                bookings[bookingKey] = [];
-            }
-            
-            bookings[bookingKey].push(booking);
-            saveBookings(); // This will also try to sync with sheets
-            
-            alert('Booking confirmed! Data saved ' + (isConnected ? 'and synced to Google Sheets' : 'locally'));
-            closeModal();
-            loadSchedule();
-        });
+// Initialize on load
+window.addEventListener('DOMContentLoaded', function() {
+    initializeConnection();
+});
 
-        // Admin functions
-        function clearAllBookings() {
-            if (confirm('Are you sure you want to clear all bookings? This cannot be undone!')) {
-                bookings = {};
-                localStorage.removeItem('eventBookings');
-                if (isConnected) {
-                    syncToSheets();
-                }
-                loadSchedule();
-                alert('All bookings cleared.');
-            }
-        }
+// Close modal when clicking outside
+window.addEventListener('click', function(e) {
+    if (e.target === document.getElementById('bookingModal')) {
+        closeModal();
+    }
+});
 
-        function backupBookings() {
-            const backup = {
-                timestamp: new Date().toISOString(),
-                bookings: bookings,
-                companies: companies
-            };
-            const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `startup-exchange-backup-${new Date().toISOString().split('T')[0]}.json`;
-            a.click();
-        }
-
-        function restoreBookings(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    try {
-                        const data = JSON.parse(e.target.result);
-                        bookings = data.bookings || data; // Handle different backup formats
-                        saveBookings();
-                        loadSchedule();
-                        alert('Bookings restored successfully!');
-                    } catch (error) {
-                        alert('Error reading backup file. Please check the file format.');
-                    }
-                };
-                reader.readAsText(file);
-            }
-        }
-
-        function exportSchedule() {
-            let csv = 'Day,Session,Time Slot,Company,Table,Student Name,Student Email,Student ID,Phone,Booking Time\n';
-            
-            for (const key in bookings) {
-                if (bookings[key].length > 0) {
-                    const [day, session, slotIndex, tableNumber] = key.split('_');
-                    const companyList = companies[day][session];
-                    const company = companyList.find(c => c.table === parseInt(tableNumber));
-                    const timeSlots = getTimeSlots(session);
-                    
-                    bookings[key].forEach(booking => {
-                        csv += `${day},${session},${timeSlots[slotIndex]},${company.name},${tableNumber},${booking.name},${booking.email},${booking.id},${booking.phone || 'N/A'},${booking.timestamp}\n`;
-                    });
-                }
-            }
-            
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `startup-exchange-bookings-${new Date().toISOString().split('T')[0]}.csv`;
-            a.click();
-        }
-
-        function viewAllBookings() {
-            let html = '<h3>All Current Bookings</h3>';
-            let totalBookings = 0;
-            
-            for (const key in bookings) {
-                if (bookings[key].length > 0) {
-                    const [day, session, slotIndex, tableNumber] = key.split('_');
-                    const companyList = companies[day][session];
-                    const company = companyList.find(c => c.table === parseInt(tableNumber));
-                    const timeSlots = getTimeSlots(session);
-                    
-                    html += `<div style="margin: 15px 0; padding: 15px; background: #f8f9fa; border-radius: 8px;">`;
-                    html += `<strong>${company.name}</strong> - ${timeSlots[slotIndex]}<br>`;
-                    html += `${day.replace('day', 'Day ')}, Session ${session.replace('session', '')}, Table ${tableNumber}<br>`;
-                    html += `<strong>Students (${bookings[key].length}/5):</strong><br>`;
-                    bookings[key].forEach(booking => {
-                        html += `• ${booking.name} (${booking.id}) - ${booking.email}<br>`;
-                        totalBookings++;
-                    });
-                    html += `</div>`;
-                }
-            }
-            
-            if (totalBookings === 0) {
-                html += '<p>No bookings yet.</p>';
-            }
-            
-            // Create modal to show bookings
-            const modal = document.createElement('div');
-            modal.style.cssText = `
-                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-                background: rgba(0,0,0,0.5); z-index: 2000; display: flex;
-                justify-content: center; align-items: center; padding: 20px;
-            `;
-            
-            const content = document.createElement('div');
-            content.style.cssText = `
-                background: white; padding: 30px; border-radius: 15px;
-                max-width: 800px; max-height: 80vh; overflow-y: auto;
-                width: 100%;
-            `;
-            
-            content.innerHTML = html + `
-                <div style="text-align: center; margin-top: 20px;">
-                    <button onclick="this.closest('.modal').remove()" 
-                            style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer;">
-                        Close
-                    </button>
-                </div>
-            `;
-            
-            modal.className = 'modal';
-            modal.appendChild(content);
-            document.body.appendChild(modal);
-        }
-
-        // Initialize on load
-        window.addEventListener('DOMContentLoaded', function() {
-            initializeConnection();
-        });
-
-        // Close modal when clicking outside
-        window.addEventListener('click', function(e) {
-            if (e.target === document.getElementById('bookingModal')) {
-                closeModal();
-            }
-        });
-
-        // Auto-save every 5 minutes
-        setInterval(() => {
-            if (isConnected) {
-                syncToSheets();
-            }
-        }, 5 * 60 * 1000);
+// Auto-save every 5 minutes
+setInterval(() => {
+    if (isConnected) {
+        syncToSheets();
+    }
+}, 5 * 60 * 1000);
     </script>
 </body>
 </html>
+
 
 
