@@ -377,7 +377,7 @@
 
     <script>
         // Configuration - Replace with your Google Sheets Web App URL
-        const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwHrPwytNq9mWJhXLdtERi3kmibBmab2fPRagJFUl7r84qgAdN7NL8sHh42zkOfaqVB/exec';
+        const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwT4YiAC5AkWGm7nzsU9VWrfmbByIwoVQNRF8DXShJyK6uv14nFxeT3h8QzYd_XFnMQ/exec';
         
         // Company data (you'll customize this with your real companies)
         const companies = {
@@ -459,7 +459,7 @@
             localStorage.setItem('eventBookings', JSON.stringify(bookings));
             
             // Try to sync with sheets if connected
-            if (isConnected && SHEETS_URL && SHEETS_URL !== 'https://script.google.com/macros/s/AKfycbwHrPwytNq9mWJhXLdtERi3kmibBmab2fPRagJFUl7r84qgAdN7NL8sHh42zkOfaqVB/exec') {
+            if (isConnected && SHEETS_URL && SHEETS_URL !== 'https://script.google.com/macros/s/AKfycbwT4YiAC5AkWGm7nzsU9VWrfmbByIwoVQNRF8DXShJyK6uv14nFxeT3h8QzYd_XFnMQ/exec') {
                 syncToSheets();
             }
         }
@@ -491,7 +491,7 @@
 
         // Load from Google Sheets
         async function loadFromSheets() {
-            if (!SHEETS_URL || SHEETS_URL === 'https://script.google.com/macros/s/AKfycbwJAoMe8UEBm7Gc9n_1jj8VCtfcGb3d2n3M_XLPfoXtlFT1XcwCzZAyLoGyd7th1fUC/exec') {
+            if (!SHEETS_URL || SHEETS_URL === 'https://script.google.com/macros/s/AKfycbwT4YiAC5AkWGm7nzsU9VWrfmbByIwoVQNRF8DXShJyK6uv14nFxeT3h8QzYd_XFnMQ/exec') {
                 alert('Please configure Google Sheets URL first');
                 return;
             }
@@ -518,7 +518,7 @@
 
         // Initialize connection
         async function initializeConnection() {
-            if (SHEETS_URL && SHEETS_URL !== 'https://script.google.com/macros/s/AKfycbwJAoMe8UEBm7Gc9n_1jj8VCtfcGb3d2n3M_XLPfoXtlFT1XcwCzZAyLoGyd7th1fUC/exec') {
+            if (SHEETS_URL && SHEETS_URL !== 'https://script.google.com/macros/s/AKfycbwT4YiAC5AkWGm7nzsU9VWrfmbByIwoVQNRF8DXShJyK6uv14nFxeT3h8QzYd_XFnMQ/exec') {
                 await loadFromSheets();
             } else {
                 updateConnectionStatus(false, 'Google Sheets not configured - using local storage only');
@@ -790,3 +790,4 @@
     </script>
 </body>
 </html>
+
