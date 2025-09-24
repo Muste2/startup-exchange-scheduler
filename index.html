@@ -94,6 +94,43 @@
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
 
+        .admin-controls {
+            background: #fff3cd;
+            padding: 15px;
+            margin: 20px 30px;
+            border-radius: 10px;
+            border: 1px solid #ffeaa7;
+        }
+
+        .admin-controls h3 {
+            margin-bottom: 10px;
+            color: #856404;
+        }
+
+        .admin-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .admin-buttons button {
+            min-width: auto;
+            padding: 8px 12px;
+            font-size: 0.9em;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+        }
+
+        .btn-success {
+            background: #28a745;
+        }
+
+        .btn-info {
+            background: #17a2b8;
+        }
+
         .schedule-grid {
             padding: 30px;
             overflow-x: auto;
@@ -212,93 +249,47 @@
             }
         }
 
-        .modal-header {
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #e0e0e0;
-        }
-
-        .modal-header h2 {
-            color: #333;
-            margin-bottom: 5px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #555;
-        }
-
-        .form-group input {
-            width: 100%;
-        }
-
-        .modal-buttons {
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-            margin-top: 25px;
-        }
-
-        .btn-cancel {
-            background: #e0e0e0;
-            color: #333;
-        }
-
-        .btn-cancel:hover {
-            background: #d0d0d0;
-        }
-
-        .bookings-list {
-            margin-top: 30px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 10px;
-        }
-
-        .bookings-list h3 {
-            margin-bottom: 15px;
-            color: #333;
-        }
-
-        .booking-item {
-            background: white;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            border-left: 4px solid #667eea;
-        }
-
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            padding: 20px 30px;
-            background: #f8f9fa;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
+        .loading {
             text-align: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        .stat-number {
-            font-size: 2em;
-            font-weight: bold;
-            color: #667eea;
-        }
-
-        .stat-label {
+            padding: 20px;
             color: #666;
-            margin-top: 5px;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+
+        .status-connected {
+            background: #28a745;
+        }
+
+        .status-disconnected {
+            background: #dc3545;
+        }
+
+        .connection-status {
+            text-align: center;
+            padding: 10px;
+            margin: 20px 30px;
+            border-radius: 5px;
+        }
+
+        .connected {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .disconnected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        input[type="file"] {
+            margin: 5px 0;
         }
     </style>
 </head>
@@ -307,6 +298,25 @@
         <div class="header">
             <h1>🚀 Startup Exchange Event Scheduler</h1>
             <p>Talent Orbit Career Fair - Interview Scheduling System</p>
+        </div>
+
+        <div class="connection-status" id="connectionStatus">
+            <span class="status-indicator status-disconnected" id="statusIndicator"></span>
+            <span id="statusText">Checking connection to Google Sheets...</span>
+        </div>
+
+        <div class="admin-controls">
+            <h3>📋 Admin Controls</h3>
+            <div class="admin-buttons">
+                <button class="btn-success" onclick="loadFromSheets()">🔄 Sync with Sheets</button>
+                <button class="btn-info" onclick="backupBookings()">💾 Download Backup</button>
+                <button class="btn-info" onclick="document.getElementById('restoreFile').click()">📂 Restore Backup</button>
+                <input type="file" id="restoreFile" accept=".json" style="display:none" onchange="restoreBookings(event)">
+                <button class="btn-danger" onclick="clearAllBookings()">🗑️ Clear All Data</button>
+            </div>
+            <p style="margin-top: 10px; font-size: 0.9em; color: #666;">
+                💡 Tip: Always sync with sheets before making changes. Download backups regularly.
+            </p>
         </div>
 
         <div class="controls">
@@ -329,28 +339,8 @@
             <button onclick="viewAllBookings()">View All Bookings</button>
         </div>
 
-        <div class="stats">
-            <div class="stat-card">
-                <div class="stat-number" id="totalBookings">0</div>
-                <div class="stat-label">Total Bookings</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="availableSlots">324</div>
-                <div class="stat-label">Available Slots</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="companiesActive">18</div>
-                <div class="stat-label">Companies Today</div>
-            </div>
-        </div>
-
         <div class="schedule-grid" id="scheduleGrid">
-            <!-- Schedule will be generated here -->
-        </div>
-
-        <div class="bookings-list" id="bookingsList" style="display: none;">
-            <h3>Current Bookings</h3>
-            <div id="bookingsContent"></div>
+            <div class="loading">Loading schedule...</div>
         </div>
     </div>
 
@@ -386,7 +376,10 @@
     </div>
 
     <script>
-        // Sample company data
+        // Configuration - Replace with your Google Sheets Web App URL
+        const SHEETS_URL = 'YOUR_GOOGLE_SHEETS_WEB_APP_URL_HERE';
+        
+        // Company data (you'll customize this with your real companies)
         const companies = {
             day1: {
                 session1: [
@@ -438,10 +431,102 @@
             }
         };
 
-        // Bookings storage
-        let bookings = {};
+        // Bookings storage - hybrid approach
+        let bookings = JSON.parse(localStorage.getItem('eventBookings')) || {};
+        let isConnected = false;
 
-        // Time slots for each session
+        function updateConnectionStatus(connected, message = '') {
+            const statusElement = document.getElementById('connectionStatus');
+            const indicatorElement = document.getElementById('statusIndicator');
+            const textElement = document.getElementById('statusText');
+            
+            isConnected = connected;
+            
+            if (connected) {
+                statusElement.className = 'connection-status connected';
+                indicatorElement.className = 'status-indicator status-connected';
+                textElement.textContent = message || 'Connected to Google Sheets - Data will sync automatically';
+            } else {
+                statusElement.className = 'connection-status disconnected';
+                indicatorElement.className = 'status-indicator status-disconnected';
+                textElement.textContent = message || 'Offline mode - Data saved locally (remember to sync when online)';
+            }
+        }
+
+        // Save bookings - hybrid approach
+        function saveBookings() {
+            // Always save locally first
+            localStorage.setItem('eventBookings', JSON.stringify(bookings));
+            
+            // Try to sync with sheets if connected
+            if (isConnected && SHEETS_URL && SHEETS_URL !== 'YOUR_GOOGLE_SHEETS_WEB_APP_URL_HERE') {
+                syncToSheets();
+            }
+        }
+
+        // Sync to Google Sheets
+        async function syncToSheets() {
+            try {
+                const response = await fetch(SHEETS_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'save',
+                        data: bookings
+                    })
+                });
+                
+                if (response.ok) {
+                    updateConnectionStatus(true, 'Data synced to Google Sheets successfully');
+                } else {
+                    throw new Error('Sync failed');
+                }
+            } catch (error) {
+                console.error('Sync error:', error);
+                updateConnectionStatus(false, 'Sync failed - working offline');
+            }
+        }
+
+        // Load from Google Sheets
+        async function loadFromSheets() {
+            if (!SHEETS_URL || SHEETS_URL === 'https://script.google.com/macros/s/AKfycbwJAoMe8UEBm7Gc9n_1jj8VCtfcGb3d2n3M_XLPfoXtlFT1XcwCzZAyLoGyd7th1fUC/exec') {
+                alert('Please configure Google Sheets URL first');
+                return;
+            }
+
+            try {
+                const response = await fetch(SHEETS_URL + '?action=load');
+                const data = await response.json();
+                
+                if (data.success) {
+                    bookings = data.bookings || {};
+                    saveBookings(); // Save locally too
+                    loadSchedule();
+                    updateConnectionStatus(true, 'Data loaded from Google Sheets');
+                    alert('Data synced successfully from Google Sheets!');
+                } else {
+                    throw new Error('Load failed');
+                }
+            } catch (error) {
+                console.error('Load error:', error);
+                updateConnectionStatus(false, 'Could not connect to Google Sheets');
+                alert('Could not connect to Google Sheets. Working with local data.');
+            }
+        }
+
+        // Initialize connection
+        async function initializeConnection() {
+            if (SHEETS_URL && SHEETS_URL !== 'https://script.google.com/macros/s/AKfycbwJAoMe8UEBm7Gc9n_1jj8VCtfcGb3d2n3M_XLPfoXtlFT1XcwCzZAyLoGyd7th1fUC/exec') {
+                await loadFromSheets();
+            } else {
+                updateConnectionStatus(false, 'Google Sheets not configured - using local storage only');
+            }
+            loadSchedule();
+        }
+
+        // Time slots function
         function getTimeSlots(session) {
             if (session === 'session1') {
                 return [
@@ -473,13 +558,11 @@
             let html = '<table>';
             html += '<thead><tr><th>Time Slot</th>';
             
-            // Add company headers
             companyList.forEach(company => {
                 html += `<th>Table ${company.table}</th>`;
             });
             html += '</tr></thead><tbody>';
             
-            // Add time slots
             timeSlots.forEach((slot, slotIndex) => {
                 html += `<tr>`;
                 html += `<td class="time-slot">${slot}</td>`;
@@ -506,7 +589,6 @@
             
             html += '</tbody></table>';
             document.getElementById('scheduleGrid').innerHTML = html;
-            updateStats();
         }
 
         function openBookingModal(day, session, slotIndex, tableNumber) {
@@ -527,11 +609,7 @@
                  <strong>Available Spots:</strong> ${5 - currentBookings.length} of 5`;
             
             document.getElementById('bookingModal').style.display = 'flex';
-            
-            // Store current booking info
             document.getElementById('bookingForm').dataset.bookingKey = bookingKey;
-            document.getElementById('bookingForm').dataset.day = day;
-            document.getElementById('bookingForm').dataset.session = session;
         }
 
         function closeModal() {
@@ -539,12 +617,11 @@
             document.getElementById('bookingForm').reset();
         }
 
+        // Booking form submission
         document.getElementById('bookingForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
             const bookingKey = this.dataset.bookingKey;
-            const day = this.dataset.day;
-            const session = this.dataset.session;
             
             const booking = {
                 name: document.getElementById('studentName').value,
@@ -559,64 +636,61 @@
             }
             
             bookings[bookingKey].push(booking);
+            saveBookings(); // This will also try to sync with sheets
             
-            alert('Booking confirmed! Check your email for confirmation details.');
+            alert('Booking confirmed! Data saved ' + (isConnected ? 'and synced to Google Sheets' : 'locally'));
             closeModal();
             loadSchedule();
         });
 
-        function updateStats() {
-            let totalBookings = 0;
-            let totalAvailable = 0;
-            
-            const day = document.getElementById('daySelect').value;
-            const session = document.getElementById('sessionSelect').value;
-            const timeSlots = getTimeSlots(session);
-            const companyList = companies[day][session];
-            
-            timeSlots.forEach((slot, slotIndex) => {
-                companyList.forEach(company => {
-                    const bookingKey = `${day}_${session}_${slotIndex}_${company.table}`;
-                    const currentBookings = bookings[bookingKey] || [];
-                    totalBookings += currentBookings.length;
-                    totalAvailable += (5 - currentBookings.length);
-                });
-            });
-            
-            document.getElementById('totalBookings').textContent = totalBookings;
-            document.getElementById('availableSlots').textContent = totalAvailable;
+        // Admin functions
+        function clearAllBookings() {
+            if (confirm('Are you sure you want to clear all bookings? This cannot be undone!')) {
+                bookings = {};
+                localStorage.removeItem('eventBookings');
+                if (isConnected) {
+                    syncToSheets();
+                }
+                loadSchedule();
+                alert('All bookings cleared.');
+            }
         }
 
-        function viewAllBookings() {
-            const bookingsList = document.getElementById('bookingsList');
-            const content = document.getElementById('bookingsContent');
-            
-            let html = '';
-            for (const key in bookings) {
-                if (bookings[key].length > 0) {
-                    const [day, session, slotIndex, tableNumber] = key.split('_');
-                    const companyList = companies[day][session];
-                    const company = companyList.find(c => c.table === parseInt(tableNumber));
-                    const timeSlots = getTimeSlots(session);
-                    
-                    html += `<div class="booking-item">`;
-                    html += `<strong>${company.name}</strong> - ${timeSlots[slotIndex]}<br>`;
-                    html += `Day: ${day.replace('day', 'Day ')}, Session: ${session.replace('session', '')}<br>`;
-                    html += `Students: `;
-                    bookings[key].forEach(booking => {
-                        html += `${booking.name} (${booking.id}), `;
-                    });
-                    html = html.slice(0, -2); // Remove last comma
-                    html += `</div>`;
-                }
+        function backupBookings() {
+            const backup = {
+                timestamp: new Date().toISOString(),
+                bookings: bookings,
+                companies: companies
+            };
+            const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `startup-exchange-backup-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+        }
+
+        function restoreBookings(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        bookings = data.bookings || data; // Handle different backup formats
+                        saveBookings();
+                        loadSchedule();
+                        alert('Bookings restored successfully!');
+                    } catch (error) {
+                        alert('Error reading backup file. Please check the file format.');
+                    }
+                };
+                reader.readAsText(file);
             }
-            
-            content.innerHTML = html || '<p>No bookings yet.</p>';
-            bookingsList.style.display = 'block';
         }
 
         function exportSchedule() {
-            let csv = 'Day,Session,Time Slot,Company,Table,Student Name,Student Email,Student ID,Phone\n';
+            let csv = 'Day,Session,Time Slot,Company,Table,Student Name,Student Email,Student ID,Phone,Booking Time\n';
             
             for (const key in bookings) {
                 if (bookings[key].length > 0) {
@@ -626,7 +700,7 @@
                     const timeSlots = getTimeSlots(session);
                     
                     bookings[key].forEach(booking => {
-                        csv += `${day},${session},${timeSlots[slotIndex]},${company.name},${tableNumber},${booking.name},${booking.email},${booking.id},${booking.phone || 'N/A'}\n`;
+                        csv += `${day},${session},${timeSlots[slotIndex]},${company.name},${tableNumber},${booking.name},${booking.email},${booking.id},${booking.phone || 'N/A'},${booking.timestamp}\n`;
                     });
                 }
             }
@@ -635,13 +709,69 @@
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'startup_exchange_bookings.csv';
+            a.download = `startup-exchange-bookings-${new Date().toISOString().split('T')[0]}.csv`;
             a.click();
+        }
+
+        function viewAllBookings() {
+            let html = '<h3>All Current Bookings</h3>';
+            let totalBookings = 0;
+            
+            for (const key in bookings) {
+                if (bookings[key].length > 0) {
+                    const [day, session, slotIndex, tableNumber] = key.split('_');
+                    const companyList = companies[day][session];
+                    const company = companyList.find(c => c.table === parseInt(tableNumber));
+                    const timeSlots = getTimeSlots(session);
+                    
+                    html += `<div style="margin: 15px 0; padding: 15px; background: #f8f9fa; border-radius: 8px;">`;
+                    html += `<strong>${company.name}</strong> - ${timeSlots[slotIndex]}<br>`;
+                    html += `${day.replace('day', 'Day ')}, Session ${session.replace('session', '')}, Table ${tableNumber}<br>`;
+                    html += `<strong>Students (${bookings[key].length}/5):</strong><br>`;
+                    bookings[key].forEach(booking => {
+                        html += `• ${booking.name} (${booking.id}) - ${booking.email}<br>`;
+                        totalBookings++;
+                    });
+                    html += `</div>`;
+                }
+            }
+            
+            if (totalBookings === 0) {
+                html += '<p>No bookings yet.</p>';
+            }
+            
+            // Create modal to show bookings
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(0,0,0,0.5); z-index: 2000; display: flex;
+                justify-content: center; align-items: center; padding: 20px;
+            `;
+            
+            const content = document.createElement('div');
+            content.style.cssText = `
+                background: white; padding: 30px; border-radius: 15px;
+                max-width: 800px; max-height: 80vh; overflow-y: auto;
+                width: 100%;
+            `;
+            
+            content.innerHTML = html + `
+                <div style="text-align: center; margin-top: 20px;">
+                    <button onclick="this.closest('.modal').remove()" 
+                            style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                        Close
+                    </button>
+                </div>
+            `;
+            
+            modal.className = 'modal';
+            modal.appendChild(content);
+            document.body.appendChild(modal);
         }
 
         // Initialize on load
         window.addEventListener('DOMContentLoaded', function() {
-            loadSchedule();
+            initializeConnection();
         });
 
         // Close modal when clicking outside
@@ -650,7 +780,13 @@
                 closeModal();
             }
         });
+
+        // Auto-save every 5 minutes
+        setInterval(() => {
+            if (isConnected) {
+                syncToSheets();
+            }
+        }, 5 * 60 * 1000);
     </script>
 </body>
-
 </html>
