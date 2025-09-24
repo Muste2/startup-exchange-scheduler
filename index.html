@@ -377,7 +377,7 @@
 
     <script>
         // Configuration - Replace with your ACTUAL Google Sheets Web App URL
-const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwxG175uIn0R6psQCHtyYL7eHoMRNzcR2UFjmgqCuCPsGbpFwQNCtzH8MiSkCreSY7K/exec';
+const  = 'https://script.google.com/macros/s/AKfycbwxG175uIn0R6psQCHtyYL7eHoMRNzcR2UFjmgqCuCPsGbpFwQNCtzH8MiSkCreSY7K/exec';
 
 // Company data (you'll customize this with your real companies)
 const companies = {
@@ -462,14 +462,6 @@ function saveBookings() {
     if (isConnected && SHEETS_URL && isValidSheetsUrl(SHEETS_URL)) {
         syncToSheets();
     }
-}
-
-// Check if the sheets URL is valid (not a placeholder)
-function isValidSheetsUrl(url) {
-    return url && 
-           url.startsWith('https://script.google.com/macros/s/') && 
-           !url.includes('AKfycbwT4YiAC5AkWGm7nzsU9VWrfmbByIwoVQNRF8DXShJyK6uv14nFxeT3h8QzYd_XFnMQ') && // old placeholder
-           url.length > 50; // reasonable length check
 }
 
 // Sync to Google Sheets
@@ -831,6 +823,7 @@ setInterval(() => {
     </script>
 </body>
 </html>
+
 
 
 
