@@ -377,7 +377,7 @@
 
     <script>
         // Configuration - Replace with your Google Sheets Web App URL
-        const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxrKlcEcZFAdlH0vqxYCwZDDqB8uuA5-nWSVwEKrEkcQz2zPOCZn0sges1ydDSXLBKm/exec';
+        const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxGbMVYoMSBS7T7r1DSCUhu9F8EXNiceOb7SL08BCc0Gxe5YRWOkgkylhOy7ZwdrGqE/exec';
         
         // Company data (you'll customize this with your real companies)
         const companies = {
@@ -465,89 +465,160 @@
         }
 
         // Sync to Google Sheets
-        async function syncToSheets() {
-            try {
-                const response = await fetch(SHEETS_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        action: 'save',
-                        data: bookings
-                    })
-                });
-                
-                if (response.ok) {
-                    updateConnectionStatus(true, 'Data synced to Google Sheets successfully');
-                } else {
-                    throw new Error('Sync failed');
-                }
-            } catch (error) {
-                console.error('Sync error:', error);
-                updateConnectionStatus(false, 'Sync failed - working offline');
-            }
+       async function syncToSheets() {
+    if (!SHEETS_URL || SHEETS_URL === 'YOUR_GOOGLE_SHEETS_WEB_APP_URL_HERE') {
+        console.log('No sheets URL configured');
+        return false;
+    }
+    
+    try {
+        console.log('Syncing to sheets...', Object.keys(bookings).length, 'booking slots');
+        
+        const response = await fetch(SHEETS_URL, {
+            method: 'POST',
+            mode: 'cors',
+            cache: 'no-cache',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                action: 'save',
+                data: bookings,
+                timestamp: new Date().toISOString()
+            })
+        });
+        
+        console.log('Sync response status:', response.status);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
+        
+        const text = await response.text();
+        console.log('Sync response:', text);
+        
+        const data = JSON.parse(text);
+        
+        if (data.success) {
+            updateConnectionStatus(true, 'Data synced to Google Sheets successfully');
+            console.log('Sync successful:', data.message);
+            return true;
+        } else {
+            throw new Error(data.error || 'Sync failed');
+        }
+        
+    } catch (error) {
+        console.error('Sync error:', error);
+        updateConnectionStatus(false, `Sync failed: ${error.message}`);
+        return false;
+    }
+}
 
         // Load from Google Sheets
-        async function loadFromSheets() {
-            if (!SHEETS_URL || SHEETS_URL === 'https://script.google.com/macros/s/AKfycbxrKlcEcZFAdlH0vqxYCwZDDqB8uuA5-nWSVwEKrEkcQz2zPOCZn0sges1ydDSXLBKm/exec') {
-                alert('Please configure Google Sheets URL first');
-                return;
-            }
+       async function loadFromSheets() {
+    if (!SHEETS_URL || SHEETS_URL === 'https://script.google.com/macros/s/AKfycbxGbMVYoMSBS7T7r1DSCUhu9F8EXNiceOb7SL08BCc0Gxe5YRWOkgkylhOy7ZwdrGqE/exec') {
+        alert('Please configure Google Sheets URL first');
+        return;
+    }
 
-            try {
-                const response = await fetch(SHEETS_URL + '?action=load');
-                const data = await response.json();
-                
-                if (data.success) {
-                    bookings = data.bookings || {};
-                    saveBookings(); // Save locally too
-                    loadSchedule();
-                    updateConnectionStatus(true, 'Data loaded from Google Sheets');
-                    alert('Data synced successfully from Google Sheets!');
-                } else {
-                    throw new Error('Load failed');
-                }
-            } catch (error) {
-                console.error('Load error:', error);
-                updateConnectionStatus(false, 'Could not connect to Google Sheets');
-                alert('Could not connect to Google Sheets. Working with local data.');
-            }
+    try {
+        console.log('Loading from sheets...');
+        
+        const response = await fetch(SHEETS_URL, {
+            method: 'GET',
+            mode: 'cors',
+            cache: 'no-cache'
+        });
+        
+        console.log('Load response status:', response.status);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
+        
+        const text = await response.text();
+        console.log('Load response:', text);
+        
+        const data = JSON.parse(text);
+        
+        if (data.success) {
+            bookings = data.bookings || {};
+            localStorage.setItem('eventBookings', JSON.stringify(bookings));
+            loadSchedule();
+            updateConnectionStatus(true, 'Data loaded from Google Sheets');
+            alert(`Data synced successfully! Loaded ${Object.keys(bookings).length} booking slots.`);
+        } else {
+            throw new Error(data.error || 'Load failed');
+        }
+        
+    } catch (error) {
+        console.error('Load error:', error);
+        updateConnectionStatus(false, `Could not connect: ${error.message}`);
+        alert(`Could not connect to Google Sheets: ${error.message}\nWorking with local data.`);
+    }
+}
 
         // Initialize connection
-        async function initializeConnection() {
-            if (SHEETS_URL && SHEETS_URL !== 'https://script.google.com/macros/s/AKfycbxrKlcEcZFAdlH0vqxYCwZDDqB8uuA5-nWSVwEKrEkcQz2zPOCZn0sges1ydDSXLBKm/exec') {
-                await loadFromSheets();
-            } else {
-                updateConnectionStatus(false, 'Google Sheets not configured - using local storage only');
-            }
-            loadSchedule();
+       async function initializeConnection() {
+    console.log('Initializing connection...');
+    
+    if (!SHEETS_URL || SHEETS_URL === 'https://script.google.com/macros/s/AKfycbxGbMVYoMSBS7T7r1DSCUhu9F8EXNiceOb7SL08BCc0Gxe5YRWOkgkylhOy7ZwdrGqE/exec') {
+        updateConnectionStatus(false, 'Google Sheets URL not configured - using local storage only');
+        loadSchedule();
+        return;
+    }
+    
+    // Test connection with a simple GET request
+    try {
+        console.log('Testing connection to:', SHEETS_URL);
+        
+        const response = await fetch(SHEETS_URL + '?test=true', {
+            method: 'GET',
+            mode: 'cors',
+            cache: 'no-cache'
+        });
+        
+        console.log('Response status:', response.status);
+        console.log('Response headers:', response.headers);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
-
-        // Time slots function
-        function getTimeSlots(session) {
-            if (session === 'session1') {
-                return [
-                    '10:00 - 10:20',
-                    '10:20 - 10:40',
-                    '10:40 - 11:00',
-                    '11:00 - 11:20',
-                    '11:20 - 11:40',
-                    '11:40 - 12:00'
-                ];
-            } else {
-                return [
-                    '14:00 - 14:20',
-                    '14:20 - 14:40',
-                    '14:40 - 15:00',
-                    '15:00 - 15:20',
-                    '15:20 - 15:40',
-                    '15:40 - 16:00'
-                ];
-            }
+        
+        const text = await response.text();
+        console.log('Response text:', text);
+        
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch (parseError) {
+            console.error('JSON parse error:', parseError);
+            throw new Error('Invalid JSON response from server');
         }
+        
+        if (data.success) {
+            bookings = data.bookings || {};
+            localStorage.setItem('eventBookings', JSON.stringify(bookings));
+            updateConnectionStatus(true, 'Connected to Google Sheets successfully');
+            console.log('Loaded bookings:', Object.keys(bookings).length, 'slots');
+        } else {
+            throw new Error(data.error || 'Unknown server error');
+        }
+        
+    } catch (error) {
+        console.error('Connection failed:', error);
+        updateConnectionStatus(false, `Connection failed: ${error.message}`);
+        
+        // Load from localStorage as fallback
+        const localBookings = localStorage.getItem('eventBookings');
+        if (localBookings) {
+            bookings = JSON.parse(localBookings);
+            console.log('Loaded from localStorage:', Object.keys(bookings).length, 'slots');
+        }
+    }
+    
+    loadSchedule();
+}
 
         function loadSchedule() {
             const day = document.getElementById('daySelect').value;
@@ -790,4 +861,5 @@
     </script>
 </body>
 </html>
+
 
