@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Startup Exchange Event Scheduler</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .controls {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .control-group label {
+            font-size: 0.9em;
+            color: #666;
+            font-weight: 600;
+        }
+
+        select, input, button {
+            padding: 10px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        select:focus, input:focus {
+            border-color: #667eea;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            min-width: 120px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .schedule-grid {
+            padding: 30px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #e0e0e0;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .time-slot {
+            font-weight: 600;
+            color: #667eea;
+            background: #f8f9fa;
+        }
+
+        .company-slot {
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .company-slot:hover {
+            background: #f0f4ff;
+            transform: scale(1.02);
+        }
+
+        .company-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .company-type {
+            font-size: 0.85em;
+            color: #666;
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-bottom: 5px;
+        }
+
+        .company-type.tech {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .company-type.vc {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .slots-info {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .slots-available {
+            color: #4caf50;
+        }
+
+        .slots-full {
+            color: #f44336;
+        }
+
+        .booking-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .modal-header h2 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group input {
+            width: 100%;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 25px;
+        }
+
+        .btn-cancel {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-cancel:hover {
+            background: #d0d0d0;
+        }
+
+        .bookings-list {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .bookings-list h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .booking-item {
+            background: white;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 20px 30px;
+            background: #f8f9fa;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Startup Exchange Event Scheduler</h1>
+            <p>Talent Orbit Career Fair - Interview Scheduling System</p>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label>Select Day</label>
+                <select id="daySelect">
+                    <option value="day1">Day 1</option>
+                    <option value="day2">Day 2</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Select Session</label>
+                <select id="sessionSelect">
+                    <option value="session1">Session 1 (10:00 - 12:00)</option>
+                    <option value="session2">Session 2 (14:00 - 16:00)</option>
+                </select>
+            </div>
+            <button onclick="loadSchedule()">Load Schedule</button>
+            <button onclick="exportSchedule()">Export to CSV</button>
+            <button onclick="viewAllBookings()">View All Bookings</button>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalBookings">0</div>
+                <div class="stat-label">Total Bookings</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="availableSlots">324</div>
+                <div class="stat-label">Available Slots</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="companiesActive">18</div>
+                <div class="stat-label">Companies Today</div>
+            </div>
+        </div>
+
+        <div class="schedule-grid" id="scheduleGrid">
+            <!-- Schedule will be generated here -->
+        </div>
+
+        <div class="bookings-list" id="bookingsList" style="display: none;">
+            <h3>Current Bookings</h3>
+            <div id="bookingsContent"></div>
+        </div>
+    </div>
+
+    <div class="booking-modal" id="bookingModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Book Interview Slot</h2>
+                <p id="modalInfo"></p>
+            </div>
+            <form id="bookingForm">
+                <div class="form-group">
+                    <label>Student Name *</label>
+                    <input type="text" id="studentName" required>
+                </div>
+                <div class="form-group">
+                    <label>Student Email *</label>
+                    <input type="email" id="studentEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>Student ID *</label>
+                    <input type="text" id="studentId" required>
+                </div>
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" id="studentPhone">
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
+                    <button type="submit">Confirm Booking</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Sample company data
+        const companies = {
+            day1: {
+                session1: [
+                    { name: "TechCorp Solutions", type: "tech", table: 1 },
+                    { name: "Venture Partners", type: "vc", table: 2 },
+                    { name: "AI Innovations", type: "tech", table: 3 },
+                    { name: "Capital Ventures", type: "vc", table: 4 },
+                    { name: "CloudTech Systems", type: "tech", table: 5 },
+                    { name: "Growth Capital", type: "vc", table: 6 },
+                    { name: "DataDrive Analytics", type: "tech", table: 7 },
+                    { name: "Seed Investors", type: "vc", table: 8 },
+                    { name: "Future Capital", type: "vc", table: 9 }
+                ],
+                session2: [
+                    { name: "Blockchain Tech", type: "tech", table: 1 },
+                    { name: "Angel Investors", type: "vc", table: 2 },
+                    { name: "Quantum Computing Co", type: "tech", table: 3 },
+                    { name: "Innovation Fund", type: "vc", table: 4 },
+                    { name: "CyberSec Solutions", type: "tech", table: 5 },
+                    { name: "Startup Accelerator", type: "vc", table: 6 },
+                    { name: "RoboTech Industries", type: "tech", table: 7 },
+                    { name: "Venture Studio", type: "vc", table: 8 },
+                    { name: "Early Stage VC", type: "vc", table: 9 }
+                ]
+            },
+            day2: {
+                session1: [
+                    { name: "FinTech Global", type: "tech", table: 1 },
+                    { name: "Impact Ventures", type: "vc", table: 2 },
+                    { name: "HealthTech Plus", type: "tech", table: 3 },
+                    { name: "Series A Partners", type: "vc", table: 4 },
+                    { name: "EdTech Solutions", type: "tech", table: 5 },
+                    { name: "Growth Equity", type: "vc", table: 6 },
+                    { name: "GreenTech Energy", type: "tech", table: 7 },
+                    { name: "Venture Capital X", type: "vc", table: 8 },
+                    { name: "Strategic Ventures", type: "vc", table: 9 }
+                ],
+                session2: [
+                    { name: "SpaceTech Corp", type: "tech", table: 1 },
+                    { name: "Future Fund", type: "vc", table: 2 },
+                    { name: "BioTech Innovations", type: "tech", table: 3 },
+                    { name: "Catalyst Capital", type: "vc", table: 4 },
+                    { name: "AR/VR Studios", type: "tech", table: 5 },
+                    { name: "Founders Fund", type: "vc", table: 6 },
+                    { name: "IoT Networks", type: "tech", table: 7 },
+                    { name: "Seed Capital", type: "vc", table: 8 },
+                    { name: "Tech Ventures", type: "vc", table: 9 }
+                ]
+            }
+        };
+
+        // Bookings storage
+        let bookings = {};
+
+        // Time slots for each session
+        function getTimeSlots(session) {
+            if (session === 'session1') {
+                return [
+                    '10:00 - 10:20',
+                    '10:20 - 10:40',
+                    '10:40 - 11:00',
+                    '11:00 - 11:20',
+                    '11:20 - 11:40',
+                    '11:40 - 12:00'
+                ];
+            } else {
+                return [
+                    '14:00 - 14:20',
+                    '14:20 - 14:40',
+                    '14:40 - 15:00',
+                    '15:00 - 15:20',
+                    '15:20 - 15:40',
+                    '15:40 - 16:00'
+                ];
+            }
+        }
+
+        function loadSchedule() {
+            const day = document.getElementById('daySelect').value;
+            const session = document.getElementById('sessionSelect').value;
+            const timeSlots = getTimeSlots(session);
+            const companyList = companies[day][session];
+            
+            let html = '<table>';
+            html += '<thead><tr><th>Time Slot</th>';
+            
+            // Add company headers
+            companyList.forEach(company => {
+                html += `<th>Table ${company.table}</th>`;
+            });
+            html += '</tr></thead><tbody>';
+            
+            // Add time slots
+            timeSlots.forEach((slot, slotIndex) => {
+                html += `<tr>`;
+                html += `<td class="time-slot">${slot}</td>`;
+                
+                companyList.forEach(company => {
+                    const bookingKey = `${day}_${session}_${slotIndex}_${company.table}`;
+                    const currentBookings = bookings[bookingKey] || [];
+                    const availableSlots = 5 - currentBookings.length;
+                    
+                    html += `<td class="company-slot" onclick="openBookingModal('${day}', '${session}', ${slotIndex}, ${company.table})">`;
+                    html += `<div class="company-name">${company.name}</div>`;
+                    html += `<div class="company-type ${company.type}">${company.type.toUpperCase()}</div>`;
+                    html += `<div class="slots-info">`;
+                    if (availableSlots > 0) {
+                        html += `<span class="slots-available">✓ ${availableSlots} slots available</span>`;
+                    } else {
+                        html += `<span class="slots-full">✗ Fully booked</span>`;
+                    }
+                    html += `</div>`;
+                    html += `</td>`;
+                });
+                html += `</tr>`;
+            });
+            
+            html += '</tbody></table>';
+            document.getElementById('scheduleGrid').innerHTML = html;
+            updateStats();
+        }
+
+        function openBookingModal(day, session, slotIndex, tableNumber) {
+            const companyList = companies[day][session];
+            const company = companyList.find(c => c.table === tableNumber);
+            const timeSlots = getTimeSlots(session);
+            const bookingKey = `${day}_${session}_${slotIndex}_${tableNumber}`;
+            const currentBookings = bookings[bookingKey] || [];
+            
+            if (currentBookings.length >= 5) {
+                alert('This slot is fully booked. Please choose another time.');
+                return;
+            }
+            
+            document.getElementById('modalInfo').innerHTML = 
+                `<strong>Company:</strong> ${company.name}<br>
+                 <strong>Time:</strong> ${timeSlots[slotIndex]}<br>
+                 <strong>Available Spots:</strong> ${5 - currentBookings.length} of 5`;
+            
+            document.getElementById('bookingModal').style.display = 'flex';
+            
+            // Store current booking info
+            document.getElementById('bookingForm').dataset.bookingKey = bookingKey;
+            document.getElementById('bookingForm').dataset.day = day;
+            document.getElementById('bookingForm').dataset.session = session;
+        }
+
+        function closeModal() {
+            document.getElementById('bookingModal').style.display = 'none';
+            document.getElementById('bookingForm').reset();
+        }
+
+        document.getElementById('bookingForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const bookingKey = this.dataset.bookingKey;
+            const day = this.dataset.day;
+            const session = this.dataset.session;
+            
+            const booking = {
+                name: document.getElementById('studentName').value,
+                email: document.getElementById('studentEmail').value,
+                id: document.getElementById('studentId').value,
+                phone: document.getElementById('studentPhone').value,
+                timestamp: new Date().toISOString()
+            };
+            
+            if (!bookings[bookingKey]) {
+                bookings[bookingKey] = [];
+            }
+            
+            bookings[bookingKey].push(booking);
+            
+            alert('Booking confirmed! Check your email for confirmation details.');
+            closeModal();
+            loadSchedule();
+        });
+
+        function updateStats() {
+            let totalBookings = 0;
+            let totalAvailable = 0;
+            
+            const day = document.getElementById('daySelect').value;
+            const session = document.getElementById('sessionSelect').value;
+            const timeSlots = getTimeSlots(session);
+            const companyList = companies[day][session];
+            
+            timeSlots.forEach((slot, slotIndex) => {
+                companyList.forEach(company => {
+                    const bookingKey = `${day}_${session}_${slotIndex}_${company.table}`;
+                    const currentBookings = bookings[bookingKey] || [];
+                    totalBookings += currentBookings.length;
+                    totalAvailable += (5 - currentBookings.length);
+                });
+            });
+            
+            document.getElementById('totalBookings').textContent = totalBookings;
+            document.getElementById('availableSlots').textContent = totalAvailable;
+        }
+
+        function viewAllBookings() {
+            const bookingsList = document.getElementById('bookingsList');
+            const content = document.getElementById('bookingsContent');
+            
+            let html = '';
+            for (const key in bookings) {
+                if (bookings[key].length > 0) {
+                    const [day, session, slotIndex, tableNumber] = key.split('_');
+                    const companyList = companies[day][session];
+                    const company = companyList.find(c => c.table === parseInt(tableNumber));
+                    const timeSlots = getTimeSlots(session);
+                    
+                    html += `<div class="booking-item">`;
+                    html += `<strong>${company.name}</strong> - ${timeSlots[slotIndex]}<br>`;
+                    html += `Day: ${day.replace('day', 'Day ')}, Session: ${session.replace('session', '')}<br>`;
+                    html += `Students: `;
+                    bookings[key].forEach(booking => {
+                        html += `${booking.name} (${booking.id}), `;
+                    });
+                    html = html.slice(0, -2); // Remove last comma
+                    html += `</div>`;
+                }
+            }
+            
+            content.innerHTML = html || '<p>No bookings yet.</p>';
+            bookingsList.style.display = 'block';
+        }
+
+        function exportSchedule() {
+            let csv = 'Day,Session,Time Slot,Company,Table,Student Name,Student Email,Student ID,Phone\n';
+            
+            for (const key in bookings) {
+                if (bookings[key].length > 0) {
+                    const [day, session, slotIndex, tableNumber] = key.split('_');
+                    const companyList = companies[day][session];
+                    const company = companyList.find(c => c.table === parseInt(tableNumber));
+                    const timeSlots = getTimeSlots(session);
+                    
+                    bookings[key].forEach(booking => {
+                        csv += `${day},${session},${timeSlots[slotIndex]},${company.name},${tableNumber},${booking.name},${booking.email},${booking.id},${booking.phone || 'N/A'}\n`;
+                    });
+                }
+            }
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'startup_exchange_bookings.csv';
+            a.click();
+        }
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', function() {
+            loadSchedule();
+        });
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(e) {
+            if (e.target === document.getElementById('bookingModal')) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
