@@ -468,8 +468,7 @@ function saveBookings() {
 function isValidSheetsUrl(url) {
     return url && 
            url.startsWith('https://script.google.com/macros/s/') && 
-           !url.includes('AKfycbwT4YiAC5AkWGm7nzsU9VWrfmbByIwoVQNRF8DXShJyK6uv14nFxeT3h8QzYd_XFnMQ') && // old placeholder
-           url.length > 50; // reasonable length check
+           !url.includes('https://script.google.com/macros/s/AKfycbyKcYVlJ-Kz2LYQKN3AvEuIztyj_RTbwJp3w8C2CS7xe8jRx07na9hZbL-w59-xw_Cu/exec')
 }
 
 // Sync to Google Sheets
@@ -831,6 +830,7 @@ setInterval(() => {
     </script>
 </body>
 </html>
+
 
 
 
