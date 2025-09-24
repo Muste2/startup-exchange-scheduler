@@ -377,7 +377,7 @@
 
     <script>
         // Configuration - Replace with your Google Sheets Web App URL
-        const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwT4YiAC5AkWGm7nzsU9VWrfmbByIwoVQNRF8DXShJyK6uv14nFxeT3h8QzYd_XFnMQ/exec';
+        const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzOb9fGVbiDkkVsZk8Z_rO51_xsbC-GZyRJLquMwAIwwBVvU2w2LbD-VgeBXGs5-emD/exec';
         
         // Company data (you'll customize this with your real companies)
         const companies = {
@@ -459,7 +459,7 @@
             localStorage.setItem('eventBookings', JSON.stringify(bookings));
             
             // Try to sync with sheets if connected
-            if (isConnected && SHEETS_URL && SHEETS_URL !== 'https://script.google.com/macros/s/AKfycbwT4YiAC5AkWGm7nzsU9VWrfmbByIwoVQNRF8DXShJyK6uv14nFxeT3h8QzYd_XFnMQ/exec') {
+            if (isConnected && SHEETS_URL && SHEETS_URL !== 'https://script.google.com/macros/s/AKfycbzOb9fGVbiDkkVsZk8Z_rO51_xsbC-GZyRJLquMwAIwwBVvU2w2LbD-VgeBXGs5-emD/exec') {
                 syncToSheets();
             }
         }
@@ -491,7 +491,7 @@
 
         // Load from Google Sheets
         async function loadFromSheets() {
-            if (!SHEETS_URL || SHEETS_URL === 'https://script.google.com/macros/s/AKfycbwT4YiAC5AkWGm7nzsU9VWrfmbByIwoVQNRF8DXShJyK6uv14nFxeT3h8QzYd_XFnMQ/exec') {
+            if (!SHEETS_URL || SHEETS_URL === 'https://script.google.com/macros/s/AKfycbzOb9fGVbiDkkVsZk8Z_rO51_xsbC-GZyRJLquMwAIwwBVvU2w2LbD-VgeBXGs5-emD/exec') {
                 alert('Please configure Google Sheets URL first');
                 return;
             }
@@ -790,4 +790,5 @@
     </script>
 </body>
 </html>
+
 
