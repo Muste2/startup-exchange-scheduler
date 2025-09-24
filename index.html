@@ -377,7 +377,7 @@
 
     <script>
         // Configuration - Replace with your Google Sheets Web App URL
-        const SHEETS_URL = 'YOUR_GOOGLE_SHEETS_WEB_APP_URL_HERE';
+        const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwHrPwytNq9mWJhXLdtERi3kmibBmab2fPRagJFUl7r84qgAdN7NL8sHh42zkOfaqVB/exec';
         
         // Company data (you'll customize this with your real companies)
         const companies = {
@@ -459,7 +459,7 @@
             localStorage.setItem('eventBookings', JSON.stringify(bookings));
             
             // Try to sync with sheets if connected
-            if (isConnected && SHEETS_URL && SHEETS_URL !== 'YOUR_GOOGLE_SHEETS_WEB_APP_URL_HERE') {
+            if (isConnected && SHEETS_URL && SHEETS_URL !== 'https://script.google.com/macros/s/AKfycbwHrPwytNq9mWJhXLdtERi3kmibBmab2fPRagJFUl7r84qgAdN7NL8sHh42zkOfaqVB/exec') {
                 syncToSheets();
             }
         }
