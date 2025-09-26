@@ -19,6 +19,13 @@
             padding: 20px;
             position: relative;
             overflow-x: auto;
+            color: #e0e0ff;
+        }
+
+        /* Force dark theme on all devices */
+        body, html {
+            background-color: #000000 !important;
+            color: #e0e0ff !important;
         }
 
         body::before {
@@ -71,7 +78,7 @@
         .container {
             max-width: 1400px;
             margin: 0 auto;
-            background: rgba(15, 15, 35, 0.95);
+            background: rgba(15, 15, 35, 0.95) !important;
             border-radius: 20px;
             box-shadow: 
                 0 20px 60px rgba(0,0,0,0.8),
@@ -83,8 +90,8 @@
         }
 
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #8e44ad 100%);
-            color: white;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #8e44ad 100%) !important;
+            color: white !important;
             padding: 40px 30px;
             text-align: center;
             position: relative;
@@ -113,6 +120,7 @@
             text-shadow: 0 0 20px rgba(255,255,255,0.5);
             position: relative;
             z-index: 1;
+            color: white !important;
         }
 
         .header p {
@@ -120,13 +128,14 @@
             opacity: 0.9;
             position: relative;
             z-index: 1;
+            color: white !important;
         }
 
         .description {
-            background: linear-gradient(135deg, rgba(15, 15, 35, 0.9) 0%, rgba(30, 30, 60, 0.9) 100%);
+            background: linear-gradient(135deg, rgba(15, 15, 35, 0.9) 0%, rgba(30, 30, 60, 0.9) 100%) !important;
             padding: 25px 30px;
             border-bottom: 2px solid rgba(102, 126, 234, 0.3);
-            color: #e0e0ff;
+            color: #e0e0ff !important;
             line-height: 1.6;
             position: relative;
         }
@@ -147,7 +156,7 @@
         }
 
         .description h3 {
-            color: #667eea;
+            color: #667eea !important;
             margin-bottom: 10px;
             text-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
         }
@@ -158,10 +167,15 @@
 
         .description li {
             margin-bottom: 5px;
+            color: #e0e0ff !important;
+        }
+
+        .description p {
+            color: #e0e0ff !important;
         }
 
         .controls {
-            background: linear-gradient(135deg, rgba(20, 20, 40, 0.9) 0%, rgba(40, 40, 80, 0.9) 100%);
+            background: linear-gradient(135deg, rgba(20, 20, 40, 0.9) 0%, rgba(40, 40, 80, 0.9) 100%) !important;
             padding: 20px 30px;
             display: flex;
             gap: 20px;
@@ -179,7 +193,7 @@
 
         .control-group label {
             font-size: 0.9em;
-            color: #b0b0ff;
+            color: #b0b0ff !important;
             font-weight: 600;
         }
 
@@ -189,8 +203,8 @@
             border-radius: 12px;
             font-size: 1em;
             transition: all 0.3s ease;
-            background: rgba(15, 15, 35, 0.8);
-            color: #e0e0ff;
+            background: rgba(15, 15, 35, 0.8) !important;
+            color: #e0e0ff !important;
             backdrop-filter: blur(5px);
         }
 
@@ -198,12 +212,12 @@
             border-color: #667eea;
             outline: none;
             box-shadow: 0 0 20px rgba(102, 126, 234, 0.4);
-            background: rgba(20, 20, 50, 0.9);
+            background: rgba(20, 20, 50, 0.9) !important;
         }
 
         button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #8e44ad 100%);
-            color: white;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #8e44ad 100%) !important;
+            color: white !important;
             border: none;
             cursor: pointer;
             font-weight: 600;
@@ -221,34 +235,43 @@
         .schedule-grid {
             padding: 30px;
             overflow-x: auto;
-            background: rgba(5, 5, 15, 0.5);
+            background: rgba(5, 5, 15, 0.5) !important;
+        }
+
+        /* Mobile-optimized table */
+        .table-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            border-radius: 15px;
+            box-shadow: 0 0 50px rgba(102, 126, 234, 0.2);
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
             min-width: 800px;
-            background: rgba(15, 15, 35, 0.9);
+            background: rgba(15, 15, 35, 0.9) !important;
             border-radius: 15px;
             overflow: hidden;
-            box-shadow: 0 0 50px rgba(102, 126, 234, 0.2);
         }
 
         th, td {
-            padding: 15px 12px;
+            padding: 12px 8px;
             text-align: left;
             border: 1px solid rgba(102, 126, 234, 0.2);
-            color: #e0e0ff;
+            color: #e0e0ff !important;
+            font-size: 0.9em;
         }
 
         th {
-            background: linear-gradient(135deg, rgba(30, 30, 60, 0.9) 0%, rgba(50, 50, 100, 0.9) 100%);
+            background: linear-gradient(135deg, rgba(30, 30, 60, 0.9) 0%, rgba(50, 50, 100, 0.9) 100%) !important;
             font-weight: 600;
-            color: #fff;
+            color: #fff !important;
             position: sticky;
             top: 0;
             z-index: 10;
             text-shadow: 0 0 10px rgba(255,255,255,0.3);
+            min-width: 120px;
         }
 
         tr.past-row {
@@ -257,17 +280,21 @@
 
         .time-slot {
             font-weight: 600;
-            color: #667eea;
-            background: linear-gradient(135deg, rgba(20, 20, 40, 0.8) 0%, rgba(40, 40, 80, 0.8) 100%);
+            color: #667eea !important;
+            background: linear-gradient(135deg, rgba(20, 20, 40, 0.8) 0%, rgba(40, 40, 80, 0.8) 100%) !important;
             text-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
+            white-space: nowrap;
+            min-width: 100px;
         }
 
         .company-slot {
-            background: linear-gradient(135deg, rgba(25, 25, 50, 0.8) 0%, rgba(35, 35, 70, 0.8) 100%);
+            background: linear-gradient(135deg, rgba(25, 25, 50, 0.8) 0%, rgba(35, 35, 70, 0.8) 100%) !important;
             cursor: pointer;
             transition: all 0.3s ease;
             position: relative;
             border-radius: 8px;
+            min-width: 140px;
+            max-width: 180px;
         }
 
         .company-slot::before {
@@ -284,7 +311,7 @@
         }
 
         .company-slot:hover {
-            background: linear-gradient(135deg, rgba(35, 35, 70, 0.9) 0%, rgba(55, 55, 110, 0.9) 100%);
+            background: linear-gradient(135deg, rgba(35, 35, 70, 0.9) 0%, rgba(55, 55, 110, 0.9) 100%) !important;
             transform: scale(1.02);
             box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
         }
@@ -294,66 +321,71 @@
         }
 
         .company-slot.booked {
-            background: linear-gradient(135deg, rgba(60, 30, 30, 0.8) 0%, rgba(80, 40, 40, 0.8) 100%);
+            background: linear-gradient(135deg, rgba(60, 30, 30, 0.8) 0%, rgba(80, 40, 40, 0.8) 100%) !important;
             cursor: not-allowed;
         }
 
         .company-slot.booked:hover {
-            background: linear-gradient(135deg, rgba(60, 30, 30, 0.8) 0%, rgba(80, 40, 40, 0.8) 100%);
+            background: linear-gradient(135deg, rgba(60, 30, 30, 0.8) 0%, rgba(80, 40, 40, 0.8) 100%) !important;
             transform: scale(1);
             box-shadow: none;
         }
 
         .company-name {
             font-weight: 600;
-            color: #fff;
-            margin-bottom: 8px;
+            color: #fff !important;
+            margin-bottom: 6px;
             text-shadow: 0 0 10px rgba(255,255,255,0.3);
+            font-size: 0.9em;
+            line-height: 1.2;
+            word-wrap: break-word;
         }
 
         .company-type {
-            font-size: 0.85em;
-            color: #fff;
+            font-size: 0.75em;
+            color: #fff !important;
             background: linear-gradient(135deg, rgba(102, 126, 234, 0.3) 0%, rgba(118, 75, 162, 0.3) 100%);
-            padding: 4px 8px;
-            border-radius: 12px;
+            padding: 3px 6px;
+            border-radius: 10px;
             display: inline-block;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             border: 1px solid rgba(102, 126, 234, 0.4);
             backdrop-filter: blur(5px);
         }
 
         .company-type.startup {
-            background: linear-gradient(135deg, rgba(67, 160, 71, 0.3) 0%, rgba(46, 125, 50, 0.3) 100%);
+            background: linear-gradient(135deg, rgba(67, 160, 71, 0.3) 0%, rgba(46, 125, 50, 0.3) 100%) !important;
             border: 1px solid rgba(67, 160, 71, 0.4);
-            color: #a5d6a7;
+            color: #a5d6a7 !important;
         }
 
         .company-type.vc {
-            background: linear-gradient(135deg, rgba(156, 39, 176, 0.3) 0%, rgba(123, 31, 162, 0.3) 100%);
+            background: linear-gradient(135deg, rgba(156, 39, 176, 0.3) 0%, rgba(123, 31, 162, 0.3) 100%) !important;
             border: 1px solid rgba(156, 39, 176, 0.4);
-            color: #ce93d8;
+            color: #ce93d8 !important;
         }
 
         .slots-info {
-            font-size: 0.9em;
-            color: #b0b0ff;
+            font-size: 0.8em;
+            color: #b0b0ff !important;
         }
 
         .slots-available {
-            color: #4ade80;
+            color: #4ade80 !important;
             text-shadow: 0 0 10px rgba(74, 222, 128, 0.5);
         }
 
         .slots-full {
-            color: #f87171;
+            color: #f87171 !important;
             text-shadow: 0 0 10px rgba(248, 113, 113, 0.5);
         }
 
         .booked-info {
-            font-size: 0.85em;
-            color: #fbbf24;
+            font-size: 0.75em;
+            color: #fbbf24 !important;
             font-style: italic;
+            word-wrap: break-word;
+            line-height: 1.1;
         }
 
         .booking-modal, .confirmation-modal {
@@ -363,7 +395,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.8) !important;
             z-index: 1000;
             justify-content: center;
             align-items: center;
@@ -371,7 +403,7 @@
         }
 
         .modal-content {
-            background: linear-gradient(135deg, rgba(15, 15, 35, 0.95) 0%, rgba(30, 30, 60, 0.95) 100%);
+            background: linear-gradient(135deg, rgba(15, 15, 35, 0.95) 0%, rgba(30, 30, 60, 0.95) 100%) !important;
             padding: 30px;
             border-radius: 20px;
             max-width: 500px;
@@ -387,7 +419,7 @@
         }
 
         .confirmation-content {
-            background: linear-gradient(135deg, rgba(15, 15, 35, 0.95) 0%, rgba(30, 30, 60, 0.95) 100%);
+            background: linear-gradient(135deg, rgba(15, 15, 35, 0.95) 0%, rgba(30, 30, 60, 0.95) 100%) !important;
             padding: 40px;
             border-radius: 20px;
             max-width: 600px;
@@ -414,12 +446,12 @@
 
         .modal-header h2 {
             margin-bottom: 15px;
-            color: #fff;
+            color: #fff !important;
             text-shadow: 0 0 20px rgba(255,255,255,0.5);
         }
 
         .modal-header p {
-            color: #b0b0ff;
+            color: #b0b0ff !important;
         }
 
         .form-group {
@@ -429,7 +461,7 @@
         .form-group label {
             display: block;
             margin-bottom: 5px;
-            color: #b0b0ff;
+            color: #b0b0ff !important;
             font-weight: 500;
         }
 
@@ -438,12 +470,12 @@
             padding: 12px;
             border: 2px solid rgba(102, 126, 234, 0.3);
             border-radius: 12px;
-            background: rgba(20, 20, 50, 0.8);
-            color: #e0e0ff;
+            background: rgba(20, 20, 50, 0.8) !important;
+            color: #e0e0ff !important;
         }
 
         .form-group small {
-            color: #9090ff;
+            color: #9090ff !important;
             font-size: 0.85em;
             margin-top: 3px;
             display: block;
@@ -457,14 +489,14 @@
         }
 
         .btn-cancel {
-            background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+            background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%) !important;
         }
 
         .loading {
             text-align: center;
             padding: 20px;
-            color: #b0b0ff;
-            background: linear-gradient(135deg, rgba(15, 15, 35, 0.8) 0%, rgba(30, 30, 60, 0.8) 100%);
+            color: #b0b0ff !important;
+            background: linear-gradient(135deg, rgba(15, 15, 35, 0.8) 0%, rgba(30, 30, 60, 0.8) 100%) !important;
             border-radius: 15px;
         }
 
@@ -476,14 +508,14 @@
         }
 
         .confirmation-title {
-            color: #4ade80;
+            color: #4ade80 !important;
             font-size: 2em;
             margin-bottom: 20px;
             text-shadow: 0 0 20px rgba(74, 222, 128, 0.5);
         }
 
         .booking-details {
-            background: linear-gradient(135deg, rgba(25, 25, 50, 0.9) 0%, rgba(35, 35, 70, 0.9) 100%);
+            background: linear-gradient(135deg, rgba(25, 25, 50, 0.9) 0%, rgba(35, 35, 70, 0.9) 100%) !important;
             padding: 25px;
             border-radius: 15px;
             margin: 20px 0;
@@ -493,7 +525,7 @@
         }
 
         .booking-details h3 {
-            color: #667eea;
+            color: #667eea !important;
             margin-bottom: 15px;
             text-align: center;
             text-shadow: 0 0 15px rgba(102, 126, 234, 0.5);
@@ -512,15 +544,15 @@
 
         .detail-label {
             font-weight: 600;
-            color: #b0b0ff;
+            color: #b0b0ff !important;
         }
 
         .detail-value {
-            color: #fff;
+            color: #fff !important;
         }
 
         .screenshot-reminder {
-            background: linear-gradient(135deg, rgba(255, 193, 7, 0.2) 0%, rgba(255, 152, 0, 0.2) 100%);
+            background: linear-gradient(135deg, rgba(255, 193, 7, 0.2) 0%, rgba(255, 152, 0, 0.2) 100%) !important;
             padding: 20px;
             border-radius: 15px;
             margin-top: 20px;
@@ -529,19 +561,19 @@
         }
 
         .screenshot-reminder p {
-            color: #ffc107;
+            color: #ffc107 !important;
             font-weight: 500;
             margin-bottom: 8px;
             text-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
         }
 
         .screenshot-reminder small {
-            color: #ffeb3b;
+            color: #ffeb3b !important;
         }
 
         .btn-close-confirmation {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #8e44ad 100%);
-            color: white;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #8e44ad 100%) !important;
+            color: white !important;
             padding: 15px 35px;
             border: none;
             border-radius: 12px;
@@ -564,8 +596,8 @@
             position: fixed;
             bottom: 30px;
             right: 30px;
-            background: linear-gradient(135deg, rgba(15, 15, 35, 0.95) 0%, rgba(30, 30, 60, 0.95) 100%);
-            color: white;
+            background: linear-gradient(135deg, rgba(15, 15, 35, 0.95) 0%, rgba(30, 30, 60, 0.95) 100%) !important;
+            color: white !important;
             padding: 15px 25px;
             border-radius: 12px;
             box-shadow: 
@@ -585,17 +617,17 @@
         }
 
         .toast.success {
-            background: linear-gradient(135deg, rgba(76, 175, 80, 0.9) 0%, rgba(56, 142, 60, 0.9) 100%);
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.9) 0%, rgba(56, 142, 60, 0.9) 100%) !important;
             border: 1px solid rgba(76, 175, 80, 0.5);
         }
 
         .toast.error {
-            background: linear-gradient(135deg, rgba(244, 67, 54, 0.9) 0%, rgba(211, 47, 47, 0.9) 100%);
+            background: linear-gradient(135deg, rgba(244, 67, 54, 0.9) 0%, rgba(211, 47, 47, 0.9) 100%) !important;
             border: 1px solid rgba(244, 67, 54, 0.5);
         }
 
         .toast.warning {
-            background: linear-gradient(135deg, rgba(255, 152, 0, 0.9) 0%, rgba(245, 124, 0, 0.9) 100%);
+            background: linear-gradient(135deg, rgba(255, 152, 0, 0.9) 0%, rgba(245, 124, 0, 0.9) 100%) !important;
             border: 1px solid rgba(255, 152, 0, 0.5);
         }
 
@@ -614,20 +646,135 @@
             50% { opacity: 1; transform: scale(1.5); }
         }
 
-        /* Responsive improvements */
+        /* Mobile-specific improvements */
         @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .header {
+                padding: 30px 20px;
+            }
+            
             .header h1 {
-                font-size: 2em;
+                font-size: 1.8em;
+            }
+            
+            .header p {
+                font-size: 1em;
+            }
+            
+            .description {
+                padding: 20px;
             }
             
             .controls {
                 flex-direction: column;
                 align-items: stretch;
+                padding: 15px 20px;
+            }
+            
+            .schedule-grid {
+                padding: 15px;
+            }
+            
+            /* Make table more mobile-friendly */
+            table {
+                min-width: 100%;
+                font-size: 0.85em;
+            }
+            
+            th, td {
+                padding: 8px 6px;
+                min-width: 100px;
+            }
+            
+            .company-name {
+                font-size: 0.85em;
+            }
+            
+            .company-type {
+                font-size: 0.7em;
+                padding: 2px 4px;
+            }
+            
+            .slots-info {
+                font-size: 0.75em;
+            }
+            
+            .booked-info {
+                font-size: 0.7em;
             }
             
             .modal-content, .confirmation-content {
                 margin: 10px;
                 width: calc(100% - 20px);
+                padding: 20px;
+            }
+            
+            .modal-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .modal-buttons button {
+                width: 100%;
+            }
+            
+            .toast {
+                bottom: 20px;
+                right: 20px;
+                left: 20px;
+                width: auto;
+            }
+            
+            /* Hide floating planet on mobile for performance */
+            body::after {
+                display: none;
+            }
+            
+            /* Reduce animations on mobile */
+            .space-decoration {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.6em;
+            }
+            
+            .description {
+                padding: 15px;
+            }
+            
+            .controls {
+                padding: 15px;
+            }
+            
+            .schedule-grid {
+                padding: 10px;
+            }
+            
+            th, td {
+                padding: 6px 4px;
+                font-size: 0.8em;
+            }
+            
+            .company-name {
+                font-size: 0.8em;
+                margin-bottom: 4px;
+            }
+            
+            .company-type {
+                font-size: 0.65em;
+            }
+        }
+
+        /* Dark mode enforcement for WebKit browsers */
+        @media (prefers-color-scheme: dark) {
+            * {
+                color-scheme: dark !important;
             }
         }
     </style>
@@ -881,13 +1028,11 @@
             return slots;
         }
 
-
         function isSlotPassed(slotTime, selectedDay) {
             const now = new Date();
             const [startTime] = slotTime.split(' - ');
             const [hours, minutes] = startTime.split(':').map(Number);
             
-
             const slotDate = new Date();
             if (selectedDay === 'day1') {
                 slotDate.setMonth(9, 2); // October 2
@@ -896,13 +1041,11 @@
             }
             slotDate.setHours(hours, minutes, 0, 0);
             
-
             const slotEndTime = new Date(slotDate);
             slotEndTime.setMinutes(slotEndTime.getMinutes() + 20);
             
             return now > slotEndTime;
         }
-
 
         async function loadFromSheets(forceRefresh = false) {
             const now = Date.now();
@@ -988,7 +1131,7 @@
             const timeSlots = getTimeSlots();
             const companyList = companies[day];
             
-            let html = '<table>';
+            let html = '<div class="table-container"><table>';
             html += '<thead><tr><th>Time Slot</th>';
             
             companyList.forEach(company => {
@@ -1027,11 +1170,10 @@
                 html += `</tr>`;
             });
             
-            html += '</tbody></table>';
+            html += '</tbody></table></div>';
             document.getElementById('scheduleGrid').innerHTML = html;
         }
 
-  
         document.getElementById('studentSchool').addEventListener('change', function() {
             const otherGroup = document.getElementById('otherSchoolGroup');
             const otherInput = document.getElementById('otherSchool');
@@ -1045,7 +1187,6 @@
             }
         });
 
-  
         function openBookingModal(day, slotIndex, tableNumber) {
             const companyList = companies[day];
             const company = companyList.find(c => c.table === tableNumber);
@@ -1073,7 +1214,6 @@
             document.getElementById('bookingForm').dataset.table = tableNumber;
         }
 
-       
         function closeModal() {
             document.getElementById('bookingModal').style.display = 'none';
             document.getElementById('bookingForm').reset();
@@ -1101,13 +1241,11 @@
             document.getElementById('confirmationModal').style.display = 'flex';
         }
 
-       
         function closeConfirmation() {
             document.getElementById('confirmationModal').style.display = 'none';
             loadSchedule(); // Refresh the schedule
         }
 
-        
         document.getElementById('bookingForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -1173,13 +1311,16 @@
         });
 
         function addSpaceDecorations() {
-            for (let i = 0; i < 20; i++) {
-                const star = document.createElement('div');
-                star.className = 'space-decoration';
-                star.style.left = Math.random() * 100 + '%';
-                star.style.top = Math.random() * 100 + '%';
-                star.style.animationDelay = Math.random() * 4 + 's';
-                document.body.appendChild(star);
+            // Only add decorations on desktop for performance
+            if (window.innerWidth > 768) {
+                for (let i = 0; i < 20; i++) {
+                    const star = document.createElement('div');
+                    star.className = 'space-decoration';
+                    star.style.left = Math.random() * 100 + '%';
+                    star.style.top = Math.random() * 100 + '%';
+                    star.style.animationDelay = Math.random() * 4 + 's';
+                    document.body.appendChild(star);
+                }
             }
         }
 
