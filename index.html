@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Startup Exchange Event Scheduler</title>
+    <link rel="icon" type="image/svg+xml" href="https://raw.githubusercontent.com/Muste2/startup-exchange-scheduler/main/talent%20orbit.svg">
     <style>
         * {
             margin: 0;
@@ -13,58 +14,161 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: radial-gradient(ellipse at center, #0f0f23 0%, #000000 100%);
             min-height: 100vh;
             padding: 20px;
+            position: relative;
+            overflow-x: auto;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, #eee, transparent),
+                radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.8), transparent),
+                radial-gradient(1px 1px at 90px 40px, rgba(255,255,255,0.6), transparent),
+                radial-gradient(1px 1px at 130px 80px, #fff, transparent),
+                radial-gradient(2px 2px at 160px 30px, rgba(255,255,255,0.9), transparent);
+            background-repeat: repeat;
+            background-size: 200px 100px;
+            animation: twinkle 20s linear infinite;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        @keyframes twinkle {
+            from { transform: translateY(0); }
+            to { transform: translateY(-100px); }
+        }
+
+        /* Floating planets */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 10%;
+            right: 5%;
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle at 30% 30%, #ff6b35, #ff4757, #8e44ad);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: float 15s ease-in-out infinite;
+            z-index: -1;
+            pointer-events: none;
+            box-shadow: 0 0 50px rgba(255, 107, 53, 0.3);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-30px) rotate(180deg); }
         }
 
         .container {
             max-width: 1400px;
             margin: 0 auto;
-            background: white;
+            background: rgba(15, 15, 35, 0.95);
             border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            box-shadow: 
+                0 20px 60px rgba(0,0,0,0.8),
+                inset 0 1px 0 rgba(255,255,255,0.1),
+                0 0 100px rgba(102, 126, 234, 0.2);
             overflow: hidden;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #8e44ad 100%);
             color: white;
-            padding: 30px;
+            padding: 40px 30px;
             text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="1" fill="white" opacity="0.3"/><circle cx="80" cy="40" r="0.5" fill="white" opacity="0.5"/><circle cx="40" cy="80" r="0.8" fill="white" opacity="0.4"/><circle cx="90" cy="80" r="0.3" fill="white" opacity="0.6"/></svg>');
+            animation: drift 30s linear infinite;
+        }
+
+        @keyframes drift {
+            from { transform: translateX(0); }
+            to { transform: translateX(-100px); }
         }
 
         .header h1 {
             font-size: 2.5em;
             margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(255,255,255,0.5);
+            position: relative;
+            z-index: 1;
         }
 
         .header p {
             font-size: 1.1em;
             opacity: 0.9;
+            position: relative;
+            z-index: 1;
         }
 
         .description {
-            background: #f0f4ff;
+            background: linear-gradient(135deg, rgba(15, 15, 35, 0.9) 0%, rgba(30, 30, 60, 0.9) 100%);
             padding: 25px 30px;
-            border-bottom: 2px solid #e0e0e0;
-            color: #333;
+            border-bottom: 2px solid rgba(102, 126, 234, 0.3);
+            color: #e0e0ff;
             line-height: 1.6;
+            position: relative;
+        }
+
+        .description::before {
+            content: '🌌';
+            position: absolute;
+            top: 25px;
+            right: 30px;
+            font-size: 2em;
+            opacity: 0.3;
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.3; }
+            50% { transform: scale(1.1); opacity: 0.6; }
         }
 
         .description h3 {
             color: #667eea;
             margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
+        }
+
+        .description ul {
+            margin: 10px 0 0 20px;
+        }
+
+        .description li {
+            margin-bottom: 5px;
         }
 
         .controls {
-            background: #f8f9fa;
+            background: linear-gradient(135deg, rgba(20, 20, 40, 0.9) 0%, rgba(40, 40, 80, 0.9) 100%);
             padding: 20px 30px;
             display: flex;
             gap: 20px;
             flex-wrap: wrap;
             align-items: center;
-            border-bottom: 2px solid #e0e0e0;
+            border-bottom: 2px solid rgba(102, 126, 234, 0.3);
+            backdrop-filter: blur(5px);
         }
 
         .control-group {
@@ -75,62 +179,76 @@
 
         .control-group label {
             font-size: 0.9em;
-            color: #666;
+            color: #b0b0ff;
             font-weight: 600;
         }
 
         select, input, button {
-            padding: 10px 15px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
+            padding: 12px 15px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 12px;
             font-size: 1em;
             transition: all 0.3s ease;
+            background: rgba(15, 15, 35, 0.8);
+            color: #e0e0ff;
+            backdrop-filter: blur(5px);
         }
 
         select:focus, input:focus {
             border-color: #667eea;
             outline: none;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.4);
+            background: rgba(20, 20, 50, 0.9);
         }
 
         button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #8e44ad 100%);
             color: white;
             border: none;
             cursor: pointer;
             font-weight: 600;
             min-width: 120px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
         }
 
         button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 
+                0 8px 25px rgba(102, 126, 234, 0.5),
+                0 0 30px rgba(102, 126, 234, 0.3);
         }
 
         .schedule-grid {
             padding: 30px;
             overflow-x: auto;
+            background: rgba(5, 5, 15, 0.5);
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
             min-width: 800px;
+            background: rgba(15, 15, 35, 0.9);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 0 50px rgba(102, 126, 234, 0.2);
         }
 
         th, td {
-            padding: 12px;
+            padding: 15px 12px;
             text-align: left;
-            border: 1px solid #e0e0e0;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            color: #e0e0ff;
         }
 
         th {
-            background: #f8f9fa;
+            background: linear-gradient(135deg, rgba(30, 30, 60, 0.9) 0%, rgba(50, 50, 100, 0.9) 100%);
             font-weight: 600;
-            color: #333;
+            color: #fff;
             position: sticky;
             top: 0;
             z-index: 10;
+            text-shadow: 0 0 10px rgba(255,255,255,0.3);
         }
 
         tr.past-row {
@@ -140,73 +258,101 @@
         .time-slot {
             font-weight: 600;
             color: #667eea;
-            background: #f8f9fa;
+            background: linear-gradient(135deg, rgba(20, 20, 40, 0.8) 0%, rgba(40, 40, 80, 0.8) 100%);
+            text-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
         }
 
         .company-slot {
-            background: white;
+            background: linear-gradient(135deg, rgba(25, 25, 50, 0.8) 0%, rgba(35, 35, 70, 0.8) 100%);
             cursor: pointer;
             transition: all 0.3s ease;
             position: relative;
+            border-radius: 8px;
+        }
+
+        .company-slot::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 0%, rgba(102, 126, 234, 0.1) 50%, transparent 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border-radius: 8px;
         }
 
         .company-slot:hover {
-            background: #f0f4ff;
+            background: linear-gradient(135deg, rgba(35, 35, 70, 0.9) 0%, rgba(55, 55, 110, 0.9) 100%);
             transform: scale(1.02);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .company-slot:hover::before {
+            opacity: 1;
         }
 
         .company-slot.booked {
-            background: #f5f5f5;
+            background: linear-gradient(135deg, rgba(60, 30, 30, 0.8) 0%, rgba(80, 40, 40, 0.8) 100%);
             cursor: not-allowed;
         }
 
         .company-slot.booked:hover {
-            background: #f5f5f5;
+            background: linear-gradient(135deg, rgba(60, 30, 30, 0.8) 0%, rgba(80, 40, 40, 0.8) 100%);
             transform: scale(1);
+            box-shadow: none;
         }
 
         .company-name {
             font-weight: 600;
-            color: #333;
-            margin-bottom: 5px;
+            color: #fff;
+            margin-bottom: 8px;
+            text-shadow: 0 0 10px rgba(255,255,255,0.3);
         }
 
         .company-type {
             font-size: 0.85em;
-            color: #666;
-            background: #f0f0f0;
-            padding: 2px 6px;
-            border-radius: 4px;
+            color: #fff;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.3) 0%, rgba(118, 75, 162, 0.3) 100%);
+            padding: 4px 8px;
+            border-radius: 12px;
             display: inline-block;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+            border: 1px solid rgba(102, 126, 234, 0.4);
+            backdrop-filter: blur(5px);
         }
 
         .company-type.startup {
-            background: #e3f2fd;
-            color: #1976d2;
+            background: linear-gradient(135deg, rgba(67, 160, 71, 0.3) 0%, rgba(46, 125, 50, 0.3) 100%);
+            border: 1px solid rgba(67, 160, 71, 0.4);
+            color: #a5d6a7;
         }
 
         .company-type.vc {
-            background: #f3e5f5;
-            color: #7b1fa2;
+            background: linear-gradient(135deg, rgba(156, 39, 176, 0.3) 0%, rgba(123, 31, 162, 0.3) 100%);
+            border: 1px solid rgba(156, 39, 176, 0.4);
+            color: #ce93d8;
         }
 
         .slots-info {
             font-size: 0.9em;
-            color: #666;
+            color: #b0b0ff;
         }
 
         .slots-available {
-            color: #4caf50;
+            color: #4ade80;
+            text-shadow: 0 0 10px rgba(74, 222, 128, 0.5);
         }
 
         .slots-full {
-            color: #f44336;
+            color: #f87171;
+            text-shadow: 0 0 10px rgba(248, 113, 113, 0.5);
         }
 
         .booked-info {
             font-size: 0.85em;
-            color: #ff9800;
+            color: #fbbf24;
             font-style: italic;
         }
 
@@ -217,48 +363,63 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.8);
             z-index: 1000;
             justify-content: center;
             align-items: center;
+            backdrop-filter: blur(10px);
         }
 
         .modal-content {
-            background: white;
+            background: linear-gradient(135deg, rgba(15, 15, 35, 0.95) 0%, rgba(30, 30, 60, 0.95) 100%);
             padding: 30px;
-            border-radius: 15px;
+            border-radius: 20px;
             max-width: 500px;
             width: 90%;
             max-height: 80vh;
             overflow-y: auto;
             animation: slideUp 0.3s ease;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            box-shadow: 
+                0 20px 60px rgba(0,0,0,0.8),
+                0 0 100px rgba(102, 126, 234, 0.3);
+            backdrop-filter: blur(15px);
         }
 
         .confirmation-content {
-            background: white;
+            background: linear-gradient(135deg, rgba(15, 15, 35, 0.95) 0%, rgba(30, 30, 60, 0.95) 100%);
             padding: 40px;
             border-radius: 20px;
             max-width: 600px;
             width: 90%;
             text-align: center;
             animation: slideUp 0.3s ease;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            box-shadow: 
+                0 20px 60px rgba(0,0,0,0.8),
+                0 0 100px rgba(102, 126, 234, 0.4);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            backdrop-filter: blur(15px);
         }
 
         @keyframes slideUp {
             from {
                 opacity: 0;
-                transform: translateY(30px);
+                transform: translateY(30px) scale(0.95);
             }
             to {
                 opacity: 1;
-                transform: translateY(0);
+                transform: translateY(0) scale(1);
             }
         }
 
         .modal-header h2 {
             margin-bottom: 15px;
-            color: #333;
+            color: #fff;
+            text-shadow: 0 0 20px rgba(255,255,255,0.5);
+        }
+
+        .modal-header p {
+            color: #b0b0ff;
         }
 
         .form-group {
@@ -268,19 +429,21 @@
         .form-group label {
             display: block;
             margin-bottom: 5px;
-            color: #666;
+            color: #b0b0ff;
             font-weight: 500;
         }
 
         .form-group input, .form-group select {
             width: 100%;
-            padding: 10px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
+            padding: 12px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 12px;
+            background: rgba(20, 20, 50, 0.8);
+            color: #e0e0ff;
         }
 
         .form-group small {
-            color: #999;
+            color: #9090ff;
             font-size: 0.85em;
             margin-top: 3px;
             display: block;
@@ -294,46 +457,53 @@
         }
 
         .btn-cancel {
-            background: #6c757d;
+            background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
         }
 
         .loading {
             text-align: center;
             padding: 20px;
-            color: #666;
+            color: #b0b0ff;
+            background: linear-gradient(135deg, rgba(15, 15, 35, 0.8) 0%, rgba(30, 30, 60, 0.8) 100%);
+            border-radius: 15px;
         }
 
         /* Confirmation modal styles */
         .confirmation-icon {
             font-size: 60px;
             margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(74, 222, 128, 0.5);
         }
 
         .confirmation-title {
-            color: #4caf50;
+            color: #4ade80;
             font-size: 2em;
             margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(74, 222, 128, 0.5);
         }
 
         .booking-details {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
+            background: linear-gradient(135deg, rgba(25, 25, 50, 0.9) 0%, rgba(35, 35, 70, 0.9) 100%);
+            padding: 25px;
+            border-radius: 15px;
             margin: 20px 0;
             text-align: left;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            backdrop-filter: blur(5px);
         }
 
         .booking-details h3 {
             color: #667eea;
             margin-bottom: 15px;
             text-align: center;
+            text-shadow: 0 0 15px rgba(102, 126, 234, 0.5);
         }
 
         .detail-row {
             display: flex;
             justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #e0e0e0;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.2);
         }
 
         .detail-row:last-child {
@@ -342,46 +512,51 @@
 
         .detail-label {
             font-weight: 600;
-            color: #666;
+            color: #b0b0ff;
         }
 
         .detail-value {
-            color: #333;
+            color: #fff;
         }
 
         .screenshot-reminder {
-            background: #fff3e0;
-            padding: 15px;
-            border-radius: 8px;
+            background: linear-gradient(135deg, rgba(255, 193, 7, 0.2) 0%, rgba(255, 152, 0, 0.2) 100%);
+            padding: 20px;
+            border-radius: 15px;
             margin-top: 20px;
-            border-left: 4px solid #ff9800;
+            border: 2px solid rgba(255, 193, 7, 0.3);
+            backdrop-filter: blur(5px);
         }
 
         .screenshot-reminder p {
-            color: #e65100;
+            color: #ffc107;
             font-weight: 500;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+            text-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
         }
 
         .screenshot-reminder small {
-            color: #666;
+            color: #ffeb3b;
         }
 
         .btn-close-confirmation {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #8e44ad 100%);
             color: white;
-            padding: 12px 30px;
+            padding: 15px 35px;
             border: none;
-            border-radius: 8px;
+            border-radius: 12px;
             font-size: 1.1em;
             cursor: pointer;
             margin-top: 20px;
             font-weight: 600;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
         }
 
         .btn-close-confirmation:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 
+                0 8px 30px rgba(102, 126, 234, 0.6),
+                0 0 40px rgba(102, 126, 234, 0.3);
         }
 
         /* Toast notification styles */
@@ -389,15 +564,19 @@
             position: fixed;
             bottom: 30px;
             right: 30px;
-            background: #333;
+            background: linear-gradient(135deg, rgba(15, 15, 35, 0.95) 0%, rgba(30, 30, 60, 0.95) 100%);
             color: white;
             padding: 15px 25px;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            border-radius: 12px;
+            box-shadow: 
+                0 5px 25px rgba(0,0,0,0.5),
+                0 0 50px rgba(102, 126, 234, 0.3);
             opacity: 0;
             transform: translateY(20px);
             transition: all 0.3s ease;
             z-index: 2000;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            backdrop-filter: blur(15px);
         }
 
         .toast.show {
@@ -406,15 +585,50 @@
         }
 
         .toast.success {
-            background: #4caf50;
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.9) 0%, rgba(56, 142, 60, 0.9) 100%);
+            border: 1px solid rgba(76, 175, 80, 0.5);
         }
 
         .toast.error {
-            background: #f44336;
+            background: linear-gradient(135deg, rgba(244, 67, 54, 0.9) 0%, rgba(211, 47, 47, 0.9) 100%);
+            border: 1px solid rgba(244, 67, 54, 0.5);
         }
 
         .toast.warning {
-            background: #ff9800;
+            background: linear-gradient(135deg, rgba(255, 152, 0, 0.9) 0%, rgba(245, 124, 0, 0.9) 100%);
+            border: 1px solid rgba(255, 152, 0, 0.5);
+        }
+
+        /* Additional space elements */
+        .space-decoration {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            animation: twinkle-stars 4s ease-in-out infinite;
+        }
+
+        @keyframes twinkle-stars {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.5); }
+        }
+
+        /* Responsive improvements */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .modal-content, .confirmation-content {
+                margin: 10px;
+                width: calc(100% - 20px);
+            }
         }
     </style>
 </head>
@@ -639,7 +853,6 @@
             }, 3000);
         }
 
-        // Get time slots with 20-minute intervals (no buffer)
         function getTimeSlots() {
             let slots = [];
             let currentTime = new Date();
@@ -651,7 +864,6 @@
                 let startHour = currentTime.getHours();
                 let startMin = currentTime.getMinutes();
                 
-                // Add 20 minutes for slot duration
                 let endSlotTime = new Date(currentTime);
                 endSlotTime.setMinutes(endSlotTime.getMinutes() + 20);
                 
@@ -663,20 +875,19 @@
                 
                 slots.push(`${startStr} - ${endStr}`);
                 
-                // Move to next slot (20 minutes)
                 currentTime.setMinutes(currentTime.getMinutes() + 20);
             }
             
             return slots;
         }
 
-        // Check if a time slot has passed
+
         function isSlotPassed(slotTime, selectedDay) {
             const now = new Date();
             const [startTime] = slotTime.split(' - ');
             const [hours, minutes] = startTime.split(':').map(Number);
             
-            // Get the date for the selected day
+
             const slotDate = new Date();
             if (selectedDay === 'day1') {
                 slotDate.setMonth(9, 2); // October 2
@@ -685,14 +896,14 @@
             }
             slotDate.setHours(hours, minutes, 0, 0);
             
-            // Add 20 minutes to get the end time
+
             const slotEndTime = new Date(slotDate);
             slotEndTime.setMinutes(slotEndTime.getMinutes() + 20);
             
             return now > slotEndTime;
         }
 
-        // Load bookings from Google Sheets with caching
+
         async function loadFromSheets(forceRefresh = false) {
             const now = Date.now();
             
@@ -820,7 +1031,7 @@
             document.getElementById('scheduleGrid').innerHTML = html;
         }
 
-        // Handle school selection change
+  
         document.getElementById('studentSchool').addEventListener('change', function() {
             const otherGroup = document.getElementById('otherSchoolGroup');
             const otherInput = document.getElementById('otherSchool');
@@ -834,7 +1045,7 @@
             }
         });
 
-        // Open booking modal
+  
         function openBookingModal(day, slotIndex, tableNumber) {
             const companyList = companies[day];
             const company = companyList.find(c => c.table === tableNumber);
@@ -862,14 +1073,13 @@
             document.getElementById('bookingForm').dataset.table = tableNumber;
         }
 
-        // Close modal
+       
         function closeModal() {
             document.getElementById('bookingModal').style.display = 'none';
             document.getElementById('bookingForm').reset();
             document.getElementById('otherSchoolGroup').style.display = 'none';
         }
 
-        // Show confirmation modal
         function showConfirmation(bookingData) {
             const day = bookingData.day;
             const slotIndex = bookingData.slotIndex;
@@ -891,13 +1101,13 @@
             document.getElementById('confirmationModal').style.display = 'flex';
         }
 
-        // Close confirmation modal
+       
         function closeConfirmation() {
             document.getElementById('confirmationModal').style.display = 'none';
             loadSchedule(); // Refresh the schedule
         }
 
-        // Handle booking form submission
+        
         document.getElementById('bookingForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -942,7 +1152,7 @@
         window.addEventListener('DOMContentLoaded', function() {
             loadSchedule();
             
-            // Auto-refresh every 60 seconds (reduced from 120)
+            // Auto-refresh every 60 seconds
             setInterval(() => {
                 loadFromSheets(true).then(() => loadSchedule());
             }, 60000);
@@ -961,6 +1171,19 @@
                 closeConfirmation();
             }
         });
+
+        function addSpaceDecorations() {
+            for (let i = 0; i < 20; i++) {
+                const star = document.createElement('div');
+                star.className = 'space-decoration';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 4 + 's';
+                document.body.appendChild(star);
+            }
+        }
+
+        window.addEventListener('load', addSpaceDecorations);
     </script>
 </body>
 </html>
