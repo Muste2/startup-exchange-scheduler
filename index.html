@@ -44,6 +44,19 @@
             opacity: 0.9;
         }
 
+        .description {
+            background: #f0f4ff;
+            padding: 25px 30px;
+            border-bottom: 2px solid #e0e0e0;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .description h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
         .controls {
             background: #f8f9fa;
             padding: 20px 30px;
@@ -118,6 +131,10 @@
             position: sticky;
             top: 0;
             z-index: 10;
+        }
+
+        tr.past-row {
+            display: none;
         }
 
         .time-slot {
@@ -255,11 +272,18 @@
             font-weight: 500;
         }
 
-        .form-group input {
+        .form-group input, .form-group select {
             width: 100%;
             padding: 10px;
             border: 2px solid #ddd;
             border-radius: 8px;
+        }
+
+        .form-group small {
+            color: #999;
+            font-size: 0.85em;
+            margin-top: 3px;
+            display: block;
         }
 
         .modal-buttons {
@@ -400,6 +424,18 @@
             <h1>🚀 Startup Exchange Event Scheduler</h1>
             <p>Talent Orbit Career Fair - Interview Scheduling System</p>
         </div>
+        
+        <div class="description">
+            <h3>About Startup Exchange</h3>
+            <p>An interactive networking experience inspired by the World Café model, designed to connect students with the startup and venture capital world. Through a series of rotating, small-group conversations, students will:</p>
+            <ul style="margin: 10px 0 0 20px;">
+                <li>Learn firsthand about the realities of launching and growing startups</li>
+                <li>Explore career paths and job opportunities in the startup ecosystem</li>
+                <li>Gain feedback and insights that can shape their own entrepreneurial ideas</li>
+            </ul>
+            <p style="margin-top: 10px;">Each table hosts a unique theme—ranging from early-stage challenges to scaling strategies, investing, and startup careers—creating space for open dialogue, practical advice, and authentic connections between students, founders, and investors.</p>
+        </div>
+        
         <div class="controls">
             <div class="control-group">
                 <label>Select Day</label>
@@ -408,8 +444,6 @@
                     <option value="day2">Day 2 - October 3</option>
                 </select>
             </div>
-            <button onclick="loadSchedule()">Refresh Schedule</button>
-            <button onclick="exportSchedule()">Export to CSV</button>
         </div>
 
         <div class="schedule-grid" id="scheduleGrid">
@@ -425,21 +459,70 @@
             </div>
             <form id="bookingForm">
                 <div class="form-group">
-                    <label>Student Name *</label>
+                    <label>Full Name *</label>
                     <input type="text" id="studentName" required>
                 </div>
-                <div class="form-group">
-                    <label>Student Email *</label>
-                    <input type="email" id="studentEmail" required>
-                </div>
+                
                 <div class="form-group">
                     <label>Student ID *</label>
                     <input type="text" id="studentId" required>
                 </div>
+                
                 <div class="form-group">
-                    <label>Phone Number</label>
-                    <input type="tel" id="studentPhone">
+                    <label>Student iMail *</label>
+                    <input type="email" id="studentEmail" required pattern=".*@imail\.sunway\.edu$">
+                    <small>Must end with @imail.sunway.edu</small>
                 </div>
+                
+                <div class="form-group">
+                    <label>School *</label>
+                    <select id="studentSchool" required>
+                        <option value="">Select your school</option>
+                        <option value="FASS">Faculty of Arts & Social Sciences (FASS)</option>
+                        <option value="FET">Faculty of Engineering & Technology (FET)</option>
+                        <option value="FMLS">Faculty of Medical & Life Sciences (FMLS)</option>
+                        <option value="SAE">School of American Education (SAE)</option>
+                        <option value="SOE">School of Education (SOE)</option>
+                        <option value="SHTM">School of Hospitality and Tourism Management (SHTM)</option>
+                        <option value="SMS">School of Mathematical Sciences (SMS)</option>
+                        <option value="SBS">Sunway Business School (SBS)</option>
+                        <option value="Others">Others (specify below)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group" id="otherSchoolGroup" style="display: none;">
+                    <label>Specify Other School</label>
+                    <input type="text" id="otherSchool">
+                </div>
+                
+                <div class="form-group">
+                    <label>Course of Study *</label>
+                    <input type="text" id="studentCourse" required placeholder="E.g., BSc (Hons) Business Management">
+                </div>
+                
+                <div class="form-group">
+                    <label>Year of Study *</label>
+                    <select id="studentYear" required>
+                        <option value="">Select year</option>
+                        <option value="Year 1">Year 1</option>
+                        <option value="Year 2">Year 2</option>
+                        <option value="Year 3">Year 3</option>
+                        <option value="Year 4">Year 4</option>
+                        <option value="Final Year">Final Year</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Contact Number *</label>
+                    <input type="tel" id="studentPhone" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Personal Email</label>
+                    <input type="email" id="personalEmail">
+                    <small>In case you are unreachable at your Student iMail</small>
+                </div>
+                
                 <div class="modal-buttons">
                     <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
                     <button type="submit">Confirm Booking</button>
@@ -476,12 +559,16 @@
                     <span class="detail-value" id="confirmName"></span>
                 </div>
                 <div class="detail-row">
-                    <span class="detail-label">Email:</span>
-                    <span class="detail-value" id="confirmEmail"></span>
-                </div>
-                <div class="detail-row">
                     <span class="detail-label">Student ID:</span>
                     <span class="detail-value" id="confirmId"></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">School:</span>
+                    <span class="detail-value" id="confirmSchool"></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Course:</span>
+                    <span class="detail-value" id="confirmCourse"></span>
                 </div>
             </div>
             
@@ -496,7 +583,7 @@
 
     <script>
         // Configuration - Replace with your Google Sheets Web App URL
-        const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxxNXtuYEqJVAEgRTc3Oihp4_VP1opyn1FQvmy_NdteurpEZ6Atla7K_KpDytWiC6Mo/exec';
+        const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwnN6EbYwCBegCTw1c5z7IXk1qtUhK4q03jLMq4AxAhH04fDvqbRTuGgkq4JyiPf7no/exec';
         
         // Company data
         const companies = {
@@ -528,8 +615,10 @@
             ]
         };
 
-        // Bookings storage (fetched from Google Sheets)
-        let bookings = {};
+        // Bookings cache
+        let bookingsCache = {};
+        let lastFetchTime = 0;
+        const CACHE_DURATION = 30000; // 30 seconds cache
 
         // Toast notification function
         function showToast(message, type = 'success') {
@@ -550,7 +639,7 @@
             }, 3000);
         }
 
-        // Get time slots with 20-minute intervals and 5-minute buffers
+        // Get time slots with 20-minute intervals (no buffer)
         function getTimeSlots() {
             let slots = [];
             let currentTime = new Date();
@@ -574,15 +663,44 @@
                 
                 slots.push(`${startStr} - ${endStr}`);
                 
-                // Move to next slot (20 min slot + 5 min buffer = 25 min)
-                currentTime.setMinutes(currentTime.getMinutes() + 25);
+                // Move to next slot (20 minutes)
+                currentTime.setMinutes(currentTime.getMinutes() + 20);
             }
             
             return slots;
         }
 
-        // Load bookings from Google Sheets
-        async function loadFromSheets() {
+        // Check if a time slot has passed
+        function isSlotPassed(slotTime, selectedDay) {
+            const now = new Date();
+            const [startTime] = slotTime.split(' - ');
+            const [hours, minutes] = startTime.split(':').map(Number);
+            
+            // Get the date for the selected day
+            const slotDate = new Date();
+            if (selectedDay === 'day1') {
+                slotDate.setMonth(9, 2); // October 2
+            } else {
+                slotDate.setMonth(9, 3); // October 3
+            }
+            slotDate.setHours(hours, minutes, 0, 0);
+            
+            // Add 20 minutes to get the end time
+            const slotEndTime = new Date(slotDate);
+            slotEndTime.setMinutes(slotEndTime.getMinutes() + 20);
+            
+            return now > slotEndTime;
+        }
+
+        // Load bookings from Google Sheets with caching
+        async function loadFromSheets(forceRefresh = false) {
+            const now = Date.now();
+            
+            // Use cache if available and not expired
+            if (!forceRefresh && Object.keys(bookingsCache).length > 0 && (now - lastFetchTime) < CACHE_DURATION) {
+                return true;
+            }
+            
             try {
                 const response = await fetch(SHEETS_URL, {
                     method: 'GET',
@@ -597,7 +715,8 @@
                 const data = await response.json();
                 
                 if (data.success) {
-                    bookings = data.bookings || {};
+                    bookingsCache = data.bookings || {};
+                    lastFetchTime = now;
                     return true;
                 } else {
                     throw new Error(data.error || 'Load failed');
@@ -612,16 +731,13 @@
         // Save booking to Google Sheets
         async function saveToSheets(bookingKey, booking) {
             try {
-                // Get company name
                 const [day, slotIndex, table] = bookingKey.split('_');
                 const companyList = companies[day];
                 const company = companyList.find(c => c.table === parseInt(table));
                 const companyName = company ? company.name : '';
                 
-                // Add company name to booking data
                 booking.company = companyName;
                 
-                // Create payload with just the new booking
                 const payload = {
                     action: 'add',
                     bookingKey: bookingKey,
@@ -639,12 +755,11 @@
                     body: JSON.stringify(payload)
                 });
                 
-                // Since mode is 'no-cors', we can't check response
-                // Assume success and update local bookings
-                if (!bookings[bookingKey]) {
-                    bookings[bookingKey] = [];
+                // Update local cache
+                if (!bookingsCache[bookingKey]) {
+                    bookingsCache[bookingKey] = [];
                 }
-                bookings[bookingKey].push(booking);
+                bookingsCache[bookingKey].push(booking);
                 
                 return true;
             } catch (error) {
@@ -656,7 +771,6 @@
 
         // Load and display schedule
         async function loadSchedule() {
-            // First load from sheets
             await loadFromSheets();
             
             const day = document.getElementById('daySelect').value;
@@ -672,12 +786,15 @@
             html += '</tr></thead><tbody>';
             
             timeSlots.forEach((slot, slotIndex) => {
-                html += `<tr>`;
+                const isPassed = isSlotPassed(slot, day);
+                const rowClass = isPassed ? 'past-row' : '';
+                
+                html += `<tr class="${rowClass}">`;
                 html += `<td class="time-slot">${slot}</td>`;
                 
                 companyList.forEach(company => {
                     const bookingKey = `${day}_${slotIndex}_${company.table}`;
-                    const currentBookings = bookings[bookingKey] || [];
+                    const currentBookings = bookingsCache[bookingKey] || [];
                     const isBooked = currentBookings.length > 0;
                     
                     html += `<td class="company-slot ${isBooked ? 'booked' : ''}" 
@@ -703,13 +820,27 @@
             document.getElementById('scheduleGrid').innerHTML = html;
         }
 
+        // Handle school selection change
+        document.getElementById('studentSchool').addEventListener('change', function() {
+            const otherGroup = document.getElementById('otherSchoolGroup');
+            const otherInput = document.getElementById('otherSchool');
+            if (this.value === 'Others') {
+                otherGroup.style.display = 'block';
+                otherInput.required = true;
+            } else {
+                otherGroup.style.display = 'none';
+                otherInput.required = false;
+                otherInput.value = '';
+            }
+        });
+
         // Open booking modal
         function openBookingModal(day, slotIndex, tableNumber) {
             const companyList = companies[day];
             const company = companyList.find(c => c.table === tableNumber);
             const timeSlots = getTimeSlots();
             const bookingKey = `${day}_${slotIndex}_${tableNumber}`;
-            const currentBookings = bookings[bookingKey] || [];
+            const currentBookings = bookingsCache[bookingKey] || [];
             
             if (currentBookings.length > 0) {
                 showToast('This slot is already booked. Please choose another time.', 'error');
@@ -735,6 +866,7 @@
         function closeModal() {
             document.getElementById('bookingModal').style.display = 'none';
             document.getElementById('bookingForm').reset();
+            document.getElementById('otherSchoolGroup').style.display = 'none';
         }
 
         // Show confirmation modal
@@ -752,8 +884,9 @@
             document.getElementById('confirmCompany').textContent = company.name;
             document.getElementById('confirmTable').textContent = tableNumber;
             document.getElementById('confirmName').textContent = bookingData.name;
-            document.getElementById('confirmEmail').textContent = bookingData.email;
-            document.getElementById('confirmId').textContent = bookingData.id;
+            document.getElementById('confirmId').textContent = bookingData.studentId;
+            document.getElementById('confirmSchool').textContent = bookingData.school;
+            document.getElementById('confirmCourse').textContent = bookingData.course;
             
             document.getElementById('confirmationModal').style.display = 'flex';
         }
@@ -773,11 +906,20 @@
             const slotIndex = this.dataset.slotIndex;
             const table = this.dataset.table;
             
+            const schoolValue = document.getElementById('studentSchool').value;
+            const finalSchool = schoolValue === 'Others' 
+                ? document.getElementById('otherSchool').value 
+                : schoolValue;
+            
             const booking = {
                 name: document.getElementById('studentName').value,
+                studentId: document.getElementById('studentId').value,
                 email: document.getElementById('studentEmail').value,
-                id: document.getElementById('studentId').value,
+                school: finalSchool,
+                course: document.getElementById('studentCourse').value,
+                year: document.getElementById('studentYear').value,
                 phone: document.getElementById('studentPhone').value,
+                personalEmail: document.getElementById('personalEmail').value,
                 timestamp: new Date().toISOString()
             };
             
@@ -796,37 +938,17 @@
             });
         });
 
-        // Export schedule to CSV
-        async function exportSchedule() {
-            // Reload fresh data first
-            await loadFromSheets();
-            
-            let csv = 'Day,Date,Time Slot,Company,Table,Student Name,Student Email,Student ID,Phone,Booking Time\n';
-            
-            for (const key in bookings) {
-                if (bookings[key].length > 0) {
-                    const [day, slotIndex, tableNumber] = key.split('_');
-                    const companyList = companies[day];
-                    const company = companyList.find(c => c.table === parseInt(tableNumber));
-                    const timeSlots = getTimeSlots();
-                    const dateStr = day === 'day1' ? 'October 2' : 'October 3';
-                    
-                    bookings[key].forEach(booking => {
-                        csv += `${day},${dateStr},${timeSlots[slotIndex]},${company.name},${tableNumber},${booking.name},${booking.email},${booking.id},${booking.phone || 'N/A'},${booking.timestamp}\n`;
-                    });
-                }
-            }
-            
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `startup-exchange-bookings-${new Date().toISOString().split('T')[0]}.csv`;
-            a.click();
-        }
-
         // Initialize on load
         window.addEventListener('DOMContentLoaded', function() {
+            loadSchedule();
+            
+            // Auto-refresh every 60 seconds (reduced from 120)
+            setInterval(() => {
+                loadFromSheets(true).then(() => loadSchedule());
+            }, 60000);
+        });
+        
+        document.getElementById('daySelect').addEventListener('change', function() {
             loadSchedule();
         });
 
@@ -839,11 +961,6 @@
                 closeConfirmation();
             }
         });
-
-        // Auto-refresh schedule every 30 seconds
-        setInterval(() => {
-            loadSchedule();
-        }, 30000);
     </script>
 </body>
 </html>
