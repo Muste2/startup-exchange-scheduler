@@ -138,6 +138,16 @@
             transform: scale(1.02);
         }
 
+        .company-slot.booked {
+            background: #f5f5f5;
+            cursor: not-allowed;
+        }
+
+        .company-slot.booked:hover {
+            background: #f5f5f5;
+            transform: scale(1);
+        }
+
         .company-name {
             font-weight: 600;
             color: #333;
@@ -154,7 +164,7 @@
             margin-bottom: 5px;
         }
 
-        .company-type.tech {
+        .company-type.startup {
             background: #e3f2fd;
             color: #1976d2;
         }
@@ -177,7 +187,13 @@
             color: #f44336;
         }
 
-        .booking-modal {
+        .booked-info {
+            font-size: 0.85em;
+            color: #ff9800;
+            font-style: italic;
+        }
+
+        .booking-modal, .confirmation-modal {
             display: none;
             position: fixed;
             top: 0;
@@ -199,6 +215,17 @@
             max-height: 80vh;
             overflow-y: auto;
             animation: slideUp 0.3s ease;
+        }
+
+        .confirmation-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+            animation: slideUp 0.3s ease;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
 
         @keyframes slideUp {
@@ -252,6 +279,87 @@
             color: #666;
         }
 
+        /* Confirmation modal styles */
+        .confirmation-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+
+        .confirmation-title {
+            color: #4caf50;
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
+        .booking-details {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .booking-details h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #666;
+        }
+
+        .detail-value {
+            color: #333;
+        }
+
+        .screenshot-reminder {
+            background: #fff3e0;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid #ff9800;
+        }
+
+        .screenshot-reminder p {
+            color: #e65100;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .screenshot-reminder small {
+            color: #666;
+        }
+
+        .btn-close-confirmation {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            margin-top: 20px;
+            font-weight: 600;
+        }
+
+        .btn-close-confirmation:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
         /* Toast notification styles */
         .toast {
             position: fixed;
@@ -296,15 +404,8 @@
             <div class="control-group">
                 <label>Select Day</label>
                 <select id="daySelect">
-                    <option value="day1">Day 1</option>
-                    <option value="day2">Day 2</option>
-                </select>
-            </div>
-            <div class="control-group">
-                <label>Select Session</label>
-                <select id="sessionSelect">
-                    <option value="session1">Session 1 (10:00 - 12:00)</option>
-                    <option value="session2">Session 2 (14:00 - 16:00)</option>
+                    <option value="day1">Day 1 - October 2</option>
+                    <option value="day2">Day 2 - October 3</option>
                 </select>
             </div>
             <button onclick="loadSchedule()">Refresh Schedule</button>
@@ -347,60 +448,84 @@
         </div>
     </div>
 
+    <div class="confirmation-modal" id="confirmationModal">
+        <div class="confirmation-content">
+            <div class="confirmation-icon">✅</div>
+            <h2 class="confirmation-title">Booking Confirmed!</h2>
+            
+            <div class="booking-details">
+                <h3>📋 Your Interview Details</h3>
+                <div class="detail-row">
+                    <span class="detail-label">Date:</span>
+                    <span class="detail-value" id="confirmDate"></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Time:</span>
+                    <span class="detail-value" id="confirmTime"></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Company:</span>
+                    <span class="detail-value" id="confirmCompany"></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Table:</span>
+                    <span class="detail-value" id="confirmTable"></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Student Name:</span>
+                    <span class="detail-value" id="confirmName"></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Email:</span>
+                    <span class="detail-value" id="confirmEmail"></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Student ID:</span>
+                    <span class="detail-value" id="confirmId"></span>
+                </div>
+            </div>
+            
+            <div class="screenshot-reminder">
+                <p>📸 Please take a screenshot of this confirmation!</p>
+                <small>You'll need to show this at your interview.</small>
+            </div>
+            
+            <button class="btn-close-confirmation" onclick="closeConfirmation()">Close</button>
+        </div>
+    </div>
+
     <script>
         // Configuration - Replace with your Google Sheets Web App URL
-        const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxYRQtL3cuRUyWKXVJPKPB6Gwx0b7xorsUeHHjc6018tHMuexwZt0qGZjv0s4R1Fa8h/exec';
+        const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxxNXtuYEqJVAEgRTc3Oihp4_VP1opyn1FQvmy_NdteurpEZ6Atla7K_KpDytWiC6Mo/exec';
         
         // Company data
         const companies = {
-            day1: {
-                session1: [
-                    { name: "TechCorp Solutions", type: "tech", table: 1 },
-                    { name: "Venture Partners", type: "vc", table: 2 },
-                    { name: "AI Innovations", type: "tech", table: 3 },
-                    { name: "Capital Ventures", type: "vc", table: 4 },
-                    { name: "CloudTech Systems", type: "tech", table: 5 },
-                    { name: "Growth Capital", type: "vc", table: 6 },
-                    { name: "DataDrive Analytics", type: "tech", table: 7 },
-                    { name: "Seed Investors", type: "vc", table: 8 },
-                    { name: "Future Capital", type: "vc", table: 9 }
-                ],
-                session2: [
-                    { name: "Blockchain Tech", type: "tech", table: 1 },
-                    { name: "Angel Investors", type: "vc", table: 2 },
-                    { name: "Quantum Computing Co", type: "tech", table: 3 },
-                    { name: "Innovation Fund", type: "vc", table: 4 },
-                    { name: "CyberSec Solutions", type: "tech", table: 5 },
-                    { name: "Startup Accelerator", type: "vc", table: 6 },
-                    { name: "RoboTech Industries", type: "tech", table: 7 },
-                    { name: "Venture Studio", type: "vc", table: 8 },
-                    { name: "Early Stage VC", type: "vc", table: 9 }
-                ]
-            },
-            day2: {
-                session1: [
-                    { name: "FinTech Global", type: "tech", table: 1 },
-                    { name: "Impact Ventures", type: "vc", table: 2 },
-                    { name: "HealthTech Plus", type: "tech", table: 3 },
-                    { name: "Series A Partners", type: "vc", table: 4 },
-                    { name: "EdTech Solutions", type: "tech", table: 5 },
-                    { name: "Growth Equity", type: "vc", table: 6 },
-                    { name: "GreenTech Energy", type: "tech", table: 7 },
-                    { name: "Venture Capital X", type: "vc", table: 8 },
-                    { name: "Strategic Ventures", type: "vc", table: 9 }
-                ],
-                session2: [
-                    { name: "SpaceTech Corp", type: "tech", table: 1 },
-                    { name: "Future Fund", type: "vc", table: 2 },
-                    { name: "BioTech Innovations", type: "tech", table: 3 },
-                    { name: "Catalyst Capital", type: "vc", table: 4 },
-                    { name: "AR/VR Studios", type: "tech", table: 5 },
-                    { name: "Founders Fund", type: "vc", table: 6 },
-                    { name: "IoT Networks", type: "tech", table: 7 },
-                    { name: "Seed Capital", type: "vc", table: 8 },
-                    { name: "Tech Ventures", type: "vc", table: 9 }
-                ]
-            }
+            day1: [
+                { name: "Block 71", type: "vc", table: 1 },
+                { name: "TheHive Sea", type: "vc", table: 2 },
+                { name: "Sunway iLabs", type: "vc", table: 3 },
+                { name: "Arclab", type: "startup", table: 4 },
+                { name: "Ourteam.ai", type: "startup", table: 5 },
+                { name: "Growth Charger", type: "vc", table: 6 },
+                { name: "AI engineer", type: "startup", table: 7 },
+                { name: "gentech AI", type: "startup", table: 8 },
+                { name: "Urban Farm Tech", type: "startup", table: 9 },
+                { name: "Gobi Partners", type: "vc", table: 10 }
+            ],
+            day2: [
+                { name: "Aonic", type: "startup", table: 1 },
+                { name: "TheHive Sea", type: "vc", table: 2 },
+                { name: "Sunway iLabs", type: "vc", table: 3 },
+                { name: "SpeedHome", type: "startup", table: 4 },
+                { name: "Arclab", type: "startup", table: 5 },
+                { name: "Ourteam.ai", type: "startup", table: 6 },
+                { name: "Growth Charger", type: "vc", table: 7 },
+                { name: "Aurellia", type: "startup", table: 8 },
+                { name: "Buzz", type: "startup", table: 9 },
+                { name: "AI engineer", type: "startup", table: 10 },
+                { name: "Urban Farm Tech", type: "startup", table: 11 },
+                { name: "Gobi Partners", type: "vc", table: 12 }
+            ]
         };
 
         // Bookings storage (fetched from Google Sheets)
@@ -425,38 +550,34 @@
             }, 3000);
         }
 
-        // Get time slots
-        function getTimeSlots(session) {
+        // Get time slots with 20-minute intervals and 5-minute buffers
+        function getTimeSlots() {
             let slots = [];
-            if (session === "session1") {
-                for (let hour = 10; hour < 12; hour++) {
-                    for (let minute of [0, 15, 30, 45]) {
-                        let start = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-                        let endMinute = minute + 15;
-                        let endHour = hour;
-                        if (endMinute >= 60) {
-                            endMinute = 0;
-                            endHour++;
-                        }
-                        let end = `${endHour.toString().padStart(2, '0')}:${endMinute.toString().padStart(2, '0')}`;
-                        slots.push(`${start} - ${end}`);
-                    }
-                }
-            } else if (session === "session2") {
-                for (let hour = 14; hour < 16; hour++) {
-                    for (let minute of [0, 15, 30, 45]) {
-                        let start = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-                        let endMinute = minute + 15;
-                        let endHour = hour;
-                        if (endMinute >= 60) {
-                            endMinute = 0;
-                            endHour++;
-                        }
-                        let end = `${endHour.toString().padStart(2, '0')}:${endMinute.toString().padStart(2, '0')}`;
-                        slots.push(`${start} - ${end}`);
-                    }
-                }
+            let currentTime = new Date();
+            currentTime.setHours(12, 30, 0); // Start at 12:30 PM
+            const endTime = new Date();
+            endTime.setHours(16, 0, 0); // End at 4:00 PM
+            
+            while (currentTime < endTime) {
+                let startHour = currentTime.getHours();
+                let startMin = currentTime.getMinutes();
+                
+                // Add 20 minutes for slot duration
+                let endSlotTime = new Date(currentTime);
+                endSlotTime.setMinutes(endSlotTime.getMinutes() + 20);
+                
+                let endHour = endSlotTime.getHours();
+                let endMin = endSlotTime.getMinutes();
+                
+                let startStr = `${startHour.toString().padStart(2, '0')}:${startMin.toString().padStart(2, '0')}`;
+                let endStr = `${endHour.toString().padStart(2, '0')}:${endMin.toString().padStart(2, '0')}`;
+                
+                slots.push(`${startStr} - ${endStr}`);
+                
+                // Move to next slot (20 min slot + 5 min buffer = 25 min)
+                currentTime.setMinutes(currentTime.getMinutes() + 25);
             }
+            
             return slots;
         }
 
@@ -492,8 +613,9 @@
         async function saveToSheets(bookingKey, booking) {
             try {
                 // Get company name
-                const [day, session, slotIndex, table] = bookingKey.split('_');
-                const company = companies[day][session].find(c => c.table === parseInt(table));
+                const [day, slotIndex, table] = bookingKey.split('_');
+                const companyList = companies[day];
+                const company = companyList.find(c => c.table === parseInt(table));
                 const companyName = company ? company.name : '';
                 
                 // Add company name to booking data
@@ -538,9 +660,8 @@
             await loadFromSheets();
             
             const day = document.getElementById('daySelect').value;
-            const session = document.getElementById('sessionSelect').value;
-            const timeSlots = getTimeSlots(session);
-            const companyList = companies[day][session];
+            const timeSlots = getTimeSlots();
+            const companyList = companies[day];
             
             let html = '<table>';
             html += '<thead><tr><th>Time Slot</th>';
@@ -555,18 +676,22 @@
                 html += `<td class="time-slot">${slot}</td>`;
                 
                 companyList.forEach(company => {
-                    const bookingKey = `${day}_${session}_${slotIndex}_${company.table}`;
+                    const bookingKey = `${day}_${slotIndex}_${company.table}`;
                     const currentBookings = bookings[bookingKey] || [];
-                    const availableSlots = 5 - currentBookings.length;
+                    const isBooked = currentBookings.length > 0;
                     
-                    html += `<td class="company-slot" onclick="openBookingModal('${day}', '${session}', ${slotIndex}, ${company.table})">`;
+                    html += `<td class="company-slot ${isBooked ? 'booked' : ''}" 
+                             onclick="${isBooked ? '' : `openBookingModal('${day}', ${slotIndex}, ${company.table})`}">`;
                     html += `<div class="company-name">${company.name}</div>`;
                     html += `<div class="company-type ${company.type}">${company.type.toUpperCase()}</div>`;
                     html += `<div class="slots-info">`;
-                    if (availableSlots > 0) {
-                        html += `<span class="slots-available">✓ ${availableSlots} slots available</span>`;
+                    if (isBooked) {
+                        html += `<span class="slots-full">✗ Booked</span>`;
+                        if (currentBookings[0]) {
+                            html += `<div class="booked-info">by ${currentBookings[0].name}</div>`;
+                        }
                     } else {
-                        html += `<span class="slots-full">✗ Fully booked</span>`;
+                        html += `<span class="slots-available">✓ Available</span>`;
                     }
                     html += `</div>`;
                     html += `</td>`;
@@ -579,25 +704,31 @@
         }
 
         // Open booking modal
-        function openBookingModal(day, session, slotIndex, tableNumber) {
-            const companyList = companies[day][session];
+        function openBookingModal(day, slotIndex, tableNumber) {
+            const companyList = companies[day];
             const company = companyList.find(c => c.table === tableNumber);
-            const timeSlots = getTimeSlots(session);
-            const bookingKey = `${day}_${session}_${slotIndex}_${tableNumber}`;
+            const timeSlots = getTimeSlots();
+            const bookingKey = `${day}_${slotIndex}_${tableNumber}`;
             const currentBookings = bookings[bookingKey] || [];
             
-            if (currentBookings.length >= 5) {
-                showToast('This slot is fully booked. Please choose another time.', 'error');
+            if (currentBookings.length > 0) {
+                showToast('This slot is already booked. Please choose another time.', 'error');
                 return;
             }
             
+            const dateStr = day === 'day1' ? 'October 2' : 'October 3';
+            
             document.getElementById('modalInfo').innerHTML = 
                 `<strong>Company:</strong> ${company.name}<br>
+                 <strong>Date:</strong> ${dateStr}<br>
                  <strong>Time:</strong> ${timeSlots[slotIndex]}<br>
-                 <strong>Available Spots:</strong> ${5 - currentBookings.length} of 5`;
+                 <strong>Table:</strong> ${tableNumber}`;
             
             document.getElementById('bookingModal').style.display = 'flex';
             document.getElementById('bookingForm').dataset.bookingKey = bookingKey;
+            document.getElementById('bookingForm').dataset.day = day;
+            document.getElementById('bookingForm').dataset.slotIndex = slotIndex;
+            document.getElementById('bookingForm').dataset.table = tableNumber;
         }
 
         // Close modal
@@ -606,11 +737,41 @@
             document.getElementById('bookingForm').reset();
         }
 
+        // Show confirmation modal
+        function showConfirmation(bookingData) {
+            const day = bookingData.day;
+            const slotIndex = bookingData.slotIndex;
+            const tableNumber = bookingData.table;
+            const companyList = companies[day];
+            const company = companyList.find(c => c.table === parseInt(tableNumber));
+            const timeSlots = getTimeSlots();
+            const dateStr = day === 'day1' ? 'October 2' : 'October 3';
+            
+            document.getElementById('confirmDate').textContent = dateStr;
+            document.getElementById('confirmTime').textContent = timeSlots[slotIndex];
+            document.getElementById('confirmCompany').textContent = company.name;
+            document.getElementById('confirmTable').textContent = tableNumber;
+            document.getElementById('confirmName').textContent = bookingData.name;
+            document.getElementById('confirmEmail').textContent = bookingData.email;
+            document.getElementById('confirmId').textContent = bookingData.id;
+            
+            document.getElementById('confirmationModal').style.display = 'flex';
+        }
+
+        // Close confirmation modal
+        function closeConfirmation() {
+            document.getElementById('confirmationModal').style.display = 'none';
+            loadSchedule(); // Refresh the schedule
+        }
+
         // Handle booking form submission
         document.getElementById('bookingForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const bookingKey = this.dataset.bookingKey;
+            const day = this.dataset.day;
+            const slotIndex = this.dataset.slotIndex;
+            const table = this.dataset.table;
             
             const booking = {
                 name: document.getElementById('studentName').value,
@@ -623,9 +784,16 @@
             // Save to sheets
             await saveToSheets(bookingKey, booking);
             
-            showToast('Booking confirmed!', 'success');
+            // Close booking modal
             closeModal();
-            loadSchedule();
+            
+            // Show confirmation modal
+            showConfirmation({
+                ...booking,
+                day: day,
+                slotIndex: slotIndex,
+                table: table
+            });
         });
 
         // Export schedule to CSV
@@ -633,17 +801,18 @@
             // Reload fresh data first
             await loadFromSheets();
             
-            let csv = 'Day,Session,Time Slot,Company,Table,Student Name,Student Email,Student ID,Phone,Booking Time\n';
+            let csv = 'Day,Date,Time Slot,Company,Table,Student Name,Student Email,Student ID,Phone,Booking Time\n';
             
             for (const key in bookings) {
                 if (bookings[key].length > 0) {
-                    const [day, session, slotIndex, tableNumber] = key.split('_');
-                    const companyList = companies[day][session];
+                    const [day, slotIndex, tableNumber] = key.split('_');
+                    const companyList = companies[day];
                     const company = companyList.find(c => c.table === parseInt(tableNumber));
-                    const timeSlots = getTimeSlots(session);
+                    const timeSlots = getTimeSlots();
+                    const dateStr = day === 'day1' ? 'October 2' : 'October 3';
                     
                     bookings[key].forEach(booking => {
-                        csv += `${day},${session},${timeSlots[slotIndex]},${company.name},${tableNumber},${booking.name},${booking.email},${booking.id},${booking.phone || 'N/A'},${booking.timestamp}\n`;
+                        csv += `${day},${dateStr},${timeSlots[slotIndex]},${company.name},${tableNumber},${booking.name},${booking.email},${booking.id},${booking.phone || 'N/A'},${booking.timestamp}\n`;
                     });
                 }
             }
@@ -665,6 +834,9 @@
         window.addEventListener('click', function(e) {
             if (e.target === document.getElementById('bookingModal')) {
                 closeModal();
+            }
+            if (e.target === document.getElementById('confirmationModal')) {
+                closeConfirmation();
             }
         });
 
