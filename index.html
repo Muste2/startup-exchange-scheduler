@@ -982,16 +982,15 @@
       
         const companies = {
             day1: [
-                { name: "Block 71", type: "vc", table: 1 },
-                { name: "TheHive Sea", type: "vc", table: 2 },
-                { name: "Sunway iLabs", type: "vc", table: 3 },
-                { name: "Arclab", type: "startup", table: 4 },
-                { name: "Ourteam.ai", type: "startup", table: 5 },
-                { name: "Growth Charger", type: "vc", table: 6 },
-                { name: "AI engineer", type: "startup", table: 7 },
-                { name: "gentech AI", type: "startup", table: 8 },
-                { name: "Urban Farm Tech", type: "startup", table: 9 },
-                { name: "Gobi Partners", type: "vc", table: 10 }
+                { name: "TheHive Sea", type: "vc", table: 1 },
+                { name: "Sunway iLabs", type: "vc", table: 2 },
+                { name: "Arclab", type: "startup", table: 3 },
+                { name: "Ourteam.ai", type: "startup", table: 4 },
+                { name: "Growth Charger", type: "vc", table: 5 },
+                { name: "AI engineer", type: "startup", table: 6 },
+                { name: "gentech AI", type: "startup", table: 7 },
+                { name: "Urban Farm Tech", type: "startup", table: 8 },
+                { name: "Gobi Partners", type: "vc", table: 9 }
             ],
             day2: [
                 { name: "Aonic", type: "startup", table: 1 },
@@ -1033,16 +1032,24 @@
             }, 3000);
         }
 
-        function getTimeSlots() {
+       function getTimeSlots() {
             let slots = [];
             let currentTime = new Date();
             currentTime.setHours(12, 30, 0); // Start at 12:30 PM
             const endTime = new Date();
-            endTime.setHours(16, 0, 0); // End at 4:00 PM
+            endTime.setHours(15, 50, 0); // End at 3:50 PM
             
             while (currentTime < endTime) {
                 let startHour = currentTime.getHours();
                 let startMin = currentTime.getMinutes();
+                
+                
+                if (startHour === 14 && startMin >= 10 && startMin < 40) {
+                   
+                    currentTime.setHours(14, 40, 0);
+                    slots.push("14:10 - 14:40 (Break)");
+                    continue;
+                }
                 
                 let endSlotTime = new Date(currentTime);
                 endSlotTime.setMinutes(endSlotTime.getMinutes() + 20);
@@ -1184,53 +1191,63 @@
                 html += `<tr class="${rowClass}">`;
                 html += `<td class="time-slot">${slot}</td>`;
                 
-                companyList.forEach(company => {
-                    const bookingKey = `${day}_${slotIndex}_${company.table}`;
-                    const currentBookings = bookingsCache[bookingKey] || [];
-                    const bookingCount = currentBookings.length;
-                    const slotsRemaining = MAX_BOOKINGS_PER_SLOT - bookingCount;
+                
+                if (slot.includes('(Break)')) {
                     
-                    let slotClass = '';
-                    let clickHandler = '';
+                    const colspan = companyList.length;
+                    html += `<td colspan="${colspan}" style="text-align: center; background: linear-gradient(135deg, rgba(60, 60, 30, 0.8) 0%, rgba(80, 80, 40, 0.8) 100%); color: #fbbf24; font-weight: 600;">
+                                🕐 Break Time - No Sessions Available
+                            </td>`;
+                } else {
                     
-                    if (bookingCount >= MAX_BOOKINGS_PER_SLOT) {
-                        slotClass = 'fully-booked';
-                    } else if (bookingCount > 0) {
-                        slotClass = 'partially-booked';
-                        clickHandler = `onclick="openBookingModal('${day}', ${slotIndex}, ${company.table})"`;
-                    } else {
-                        clickHandler = `onclick="openBookingModal('${day}', ${slotIndex}, ${company.table})"`;
-                    }
-                    
-                    html += `<td class="company-slot ${slotClass}" ${clickHandler}>`;
-                    html += `<div class="company-name">${company.name}</div>`;
-                    html += `<div class="company-type ${company.type}">${company.type.toUpperCase()}</div>`;
-                    html += `<div class="slots-info">`;
-                    
-                    if (bookingCount >= MAX_BOOKINGS_PER_SLOT) {
-                        html += `<span class="slots-full">✗ Full (${bookingCount}/${MAX_BOOKINGS_PER_SLOT})</span>`;
-                    } else if (bookingCount > 0) {
-                        html += `<span class="slots-partial">⚬ ${slotsRemaining} left (${bookingCount}/${MAX_BOOKINGS_PER_SLOT})</span>`;
-                    } else {
-                        html += `<span class="slots-available">✓ Available (${MAX_BOOKINGS_PER_SLOT} slots)</span>`;
-                    }
-                    
-                    html += `</div>`;
-                    
-               
-                    if (bookingCount > 0) {
-                        html += `<div class="booked-list">`;
-                        currentBookings.slice(0, 3).forEach(booking => {
-                            html += `<span class="booked-student">${booking.name}</span>`;
-                        });
-                        if (bookingCount > 3) {
-                            html += `<span class="booked-student">+${bookingCount - 3} more...</span>`;
+                    companyList.forEach(company => {
+                        const bookingKey = `${day}_${slotIndex}_${company.table}`;
+                        const currentBookings = bookingsCache[bookingKey] || [];
+                        const bookingCount = currentBookings.length;
+                        const slotsRemaining = MAX_BOOKINGS_PER_SLOT - bookingCount;
+                        
+                        let slotClass = '';
+                        let clickHandler = '';
+                        
+                        if (bookingCount >= MAX_BOOKINGS_PER_SLOT) {
+                            slotClass = 'fully-booked';
+                        } else if (bookingCount > 0) {
+                            slotClass = 'partially-booked';
+                            clickHandler = `onclick="openBookingModal('${day}', ${slotIndex}, ${company.table})"`;
+                        } else {
+                            clickHandler = `onclick="openBookingModal('${day}', ${slotIndex}, ${company.table})"`;
                         }
+                        
+                        html += `<td class="company-slot ${slotClass}" ${clickHandler}>`;
+                        html += `<div class="company-name">${company.name}</div>`;
+                        html += `<div class="company-type ${company.type}">${company.type.toUpperCase()}</div>`;
+                        html += `<div class="slots-info">`;
+                        
+                        if (bookingCount >= MAX_BOOKINGS_PER_SLOT) {
+                            html += `<span class="slots-full">✗ Full (${bookingCount}/${MAX_BOOKINGS_PER_SLOT})</span>`;
+                        } else if (bookingCount > 0) {
+                            html += `<span class="slots-partial">⚬ ${slotsRemaining} left (${bookingCount}/${MAX_BOOKINGS_PER_SLOT})</span>`;
+                        } else {
+                            html += `<span class="slots-available">✓ Available (${MAX_BOOKINGS_PER_SLOT} slots)</span>`;
+                        }
+                        
                         html += `</div>`;
-                    }
-                    
-                    html += `</td>`;
-                });
+                        
+                        
+                        if (bookingCount > 0) {
+                            html += `<div class="booked-list">`;
+                            currentBookings.slice(0, 3).forEach(booking => {
+                                html += `<span class="booked-student">${booking.name}</span>`;
+                            });
+                            if (bookingCount > 3) {
+                                html += `<span class="booked-student">+${bookingCount - 3} more...</span>`;
+                            }
+                            html += `</div>`;
+                        }
+                        
+                        html += `</td>`;
+                    });
+                }
                 html += `</tr>`;
             });
             
