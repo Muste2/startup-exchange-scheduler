@@ -297,6 +297,10 @@
             max-width: 180px;
         }
 
+        .company-slot.partially-booked {
+            background: linear-gradient(135deg, rgba(40, 40, 20, 0.8) 0%, rgba(60, 60, 30, 0.8) 100%) !important;
+        }
+
         .company-slot::before {
             content: '';
             position: absolute;
@@ -320,12 +324,12 @@
             opacity: 1;
         }
 
-        .company-slot.booked {
+        .company-slot.fully-booked {
             background: linear-gradient(135deg, rgba(60, 30, 30, 0.8) 0%, rgba(80, 40, 40, 0.8) 100%) !important;
             cursor: not-allowed;
         }
 
-        .company-slot.booked:hover {
+        .company-slot.fully-booked:hover {
             background: linear-gradient(135deg, rgba(60, 30, 30, 0.8) 0%, rgba(80, 40, 40, 0.8) 100%) !important;
             transform: scale(1);
             box-shadow: none;
@@ -373,19 +377,35 @@
         .slots-available {
             color: #4ade80 !important;
             text-shadow: 0 0 10px rgba(74, 222, 128, 0.5);
+            font-weight: 600;
+        }
+
+        .slots-partial {
+            color: #fbbf24 !important;
+            text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+            font-weight: 600;
         }
 
         .slots-full {
             color: #f87171 !important;
             text-shadow: 0 0 10px rgba(248, 113, 113, 0.5);
+            font-weight: 600;
         }
 
-        .booked-info {
-            font-size: 0.75em;
-            color: #fbbf24 !important;
-            font-style: italic;
-            word-wrap: break-word;
-            line-height: 1.1;
+        .booked-list {
+            font-size: 0.7em;
+            color: #9090ff !important;
+            margin-top: 4px;
+            line-height: 1.2;
+            max-height: 40px;
+            overflow-y: auto;
+        }
+
+        .booked-student {
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .booking-modal, .confirmation-modal {
@@ -452,6 +472,17 @@
 
         .modal-header p {
             color: #b0b0ff !important;
+        }
+
+        .slots-remaining {
+            background: linear-gradient(135deg, rgba(74, 222, 128, 0.2) 0%, rgba(46, 125, 50, 0.2) 100%) !important;
+            padding: 10px;
+            border-radius: 10px;
+            margin: 10px 0;
+            border: 1px solid rgba(74, 222, 128, 0.3);
+            text-align: center;
+            font-weight: 600;
+            color: #4ade80 !important;
         }
 
         .form-group {
@@ -702,8 +733,8 @@
                 font-size: 0.75em;
             }
             
-            .booked-info {
-                font-size: 0.7em;
+            .booked-list {
+                font-size: 0.65em;
             }
             
             .modal-content, .confirmation-content {
@@ -795,6 +826,7 @@
                 <li>Gain feedback and insights that can shape their own entrepreneurial ideas</li>
             </ul>
             <p style="margin-top: 10px;">Each table hosts a unique theme—ranging from early-stage challenges to scaling strategies, investing, and startup careers—creating space for open dialogue, practical advice, and authentic connections between students, founders, and investors.</p>
+            <p style="margin-top: 10px; color: #fbbf24 !important; font-weight: 600;">📢 Note: Each time slot can accommodate up to 5 students per company table</p>
         </div>
         
         <div class="controls">
@@ -817,6 +849,7 @@
             <div class="modal-header">
                 <h2>Book Interview Slot</h2>
                 <p id="modalInfo"></p>
+                <div id="slotsRemaining" class="slots-remaining" style="display:none;"></div>
             </div>
             <form id="bookingForm">
                 <div class="form-group">
@@ -943,10 +976,10 @@
     </div>
 
     <script>
-        // Configuration - Replace with your Google Sheets Web App URL
-        const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwnN6EbYwCBegCTw1c5z7IXk1qtUhK4q03jLMq4AxAhH04fDvqbRTuGgkq4JyiPf7no/exec';
+        const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxCTeH_jAJeFyZyU99WSHrVL8SlRibgaFzZSJKMTSfwRQGmitWtFqQqfpXgoSvY1PBN/exec';
+        const MAX_BOOKINGS_PER_SLOT = 5; 
         
-        // Company data
+      
         const companies = {
             day1: [
                 { name: "Block 71", type: "vc", table: 1 },
@@ -976,12 +1009,12 @@
             ]
         };
 
-        // Bookings cache
+        
         let bookingsCache = {};
         let lastFetchTime = 0;
         const CACHE_DURATION = 30000; // 30 seconds cache
 
-        // Toast notification function
+        
         function showToast(message, type = 'success') {
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
@@ -1049,8 +1082,7 @@
 
         async function loadFromSheets(forceRefresh = false) {
             const now = Date.now();
-            
-            // Use cache if available and not expired
+  
             if (!forceRefresh && Object.keys(bookingsCache).length > 0 && (now - lastFetchTime) < CACHE_DURATION) {
                 return true;
             }
@@ -1082,7 +1114,13 @@
             }
         }
 
-        // Save booking to Google Sheets
+       
+        function hasUserBookedSlot(bookingKey, userEmail) {
+            const currentBookings = bookingsCache[bookingKey] || [];
+            return currentBookings.some(booking => booking.email === userEmail);
+        }
+
+        
         async function saveToSheets(bookingKey, booking) {
             try {
                 const [day, slotIndex, table] = bookingKey.split('_');
@@ -1109,7 +1147,7 @@
                     body: JSON.stringify(payload)
                 });
                 
-                // Update local cache
+            
                 if (!bookingsCache[bookingKey]) {
                     bookingsCache[bookingKey] = [];
                 }
@@ -1123,7 +1161,7 @@
             }
         }
 
-        // Load and display schedule
+        
         async function loadSchedule() {
             await loadFromSheets();
             
@@ -1149,22 +1187,48 @@
                 companyList.forEach(company => {
                     const bookingKey = `${day}_${slotIndex}_${company.table}`;
                     const currentBookings = bookingsCache[bookingKey] || [];
-                    const isBooked = currentBookings.length > 0;
+                    const bookingCount = currentBookings.length;
+                    const slotsRemaining = MAX_BOOKINGS_PER_SLOT - bookingCount;
                     
-                    html += `<td class="company-slot ${isBooked ? 'booked' : ''}" 
-                             onclick="${isBooked ? '' : `openBookingModal('${day}', ${slotIndex}, ${company.table})`}">`;
+                    let slotClass = '';
+                    let clickHandler = '';
+                    
+                    if (bookingCount >= MAX_BOOKINGS_PER_SLOT) {
+                        slotClass = 'fully-booked';
+                    } else if (bookingCount > 0) {
+                        slotClass = 'partially-booked';
+                        clickHandler = `onclick="openBookingModal('${day}', ${slotIndex}, ${company.table})"`;
+                    } else {
+                        clickHandler = `onclick="openBookingModal('${day}', ${slotIndex}, ${company.table})"`;
+                    }
+                    
+                    html += `<td class="company-slot ${slotClass}" ${clickHandler}>`;
                     html += `<div class="company-name">${company.name}</div>`;
                     html += `<div class="company-type ${company.type}">${company.type.toUpperCase()}</div>`;
                     html += `<div class="slots-info">`;
-                    if (isBooked) {
-                        html += `<span class="slots-full">✗ Booked</span>`;
-                        if (currentBookings[0]) {
-                            html += `<div class="booked-info">by ${currentBookings[0].name}</div>`;
-                        }
+                    
+                    if (bookingCount >= MAX_BOOKINGS_PER_SLOT) {
+                        html += `<span class="slots-full">✗ Full (${bookingCount}/${MAX_BOOKINGS_PER_SLOT})</span>`;
+                    } else if (bookingCount > 0) {
+                        html += `<span class="slots-partial">⚬ ${slotsRemaining} left (${bookingCount}/${MAX_BOOKINGS_PER_SLOT})</span>`;
                     } else {
-                        html += `<span class="slots-available">✓ Available</span>`;
+                        html += `<span class="slots-available">✓ Available (${MAX_BOOKINGS_PER_SLOT} slots)</span>`;
                     }
+                    
                     html += `</div>`;
+                    
+               
+                    if (bookingCount > 0) {
+                        html += `<div class="booked-list">`;
+                        currentBookings.slice(0, 3).forEach(booking => {
+                            html += `<span class="booked-student">${booking.name}</span>`;
+                        });
+                        if (bookingCount > 3) {
+                            html += `<span class="booked-student">+${bookingCount - 3} more...</span>`;
+                        }
+                        html += `</div>`;
+                    }
+                    
                     html += `</td>`;
                 });
                 html += `</tr>`;
@@ -1193,9 +1257,10 @@
             const timeSlots = getTimeSlots();
             const bookingKey = `${day}_${slotIndex}_${tableNumber}`;
             const currentBookings = bookingsCache[bookingKey] || [];
+            const slotsRemaining = MAX_BOOKINGS_PER_SLOT - currentBookings.length;
             
-            if (currentBookings.length > 0) {
-                showToast('This slot is already booked. Please choose another time.', 'error');
+            if (slotsRemaining <= 0) {
+                showToast('This slot is fully booked. Please choose another time.', 'error');
                 return;
             }
             
@@ -1206,6 +1271,11 @@
                  <strong>Date:</strong> ${dateStr}<br>
                  <strong>Time:</strong> ${timeSlots[slotIndex]}<br>
                  <strong>Table:</strong> ${tableNumber}`;
+                 
+           
+            const slotsRemainingDiv = document.getElementById('slotsRemaining');
+            slotsRemainingDiv.style.display = 'block';
+            slotsRemainingDiv.textContent = `${slotsRemaining} out of ${MAX_BOOKINGS_PER_SLOT} slots remaining`;
             
             document.getElementById('bookingModal').style.display = 'flex';
             document.getElementById('bookingForm').dataset.bookingKey = bookingKey;
@@ -1218,6 +1288,7 @@
             document.getElementById('bookingModal').style.display = 'none';
             document.getElementById('bookingForm').reset();
             document.getElementById('otherSchoolGroup').style.display = 'none';
+            document.getElementById('slotsRemaining').style.display = 'none';
         }
 
         function showConfirmation(bookingData) {
@@ -1243,7 +1314,7 @@
 
         function closeConfirmation() {
             document.getElementById('confirmationModal').style.display = 'none';
-            loadSchedule(); // Refresh the schedule
+            loadSchedule(); 
         }
 
         document.getElementById('bookingForm').addEventListener('submit', async function(e) {
@@ -1253,6 +1324,22 @@
             const day = this.dataset.day;
             const slotIndex = this.dataset.slotIndex;
             const table = this.dataset.table;
+            const userEmail = document.getElementById('studentEmail').value;
+            
+        
+            if (hasUserBookedSlot(bookingKey, userEmail)) {
+                showToast('You have already booked this time slot!', 'error');
+                return;
+            }
+            
+
+            const currentBookings = bookingsCache[bookingKey] || [];
+            if (currentBookings.length >= MAX_BOOKINGS_PER_SLOT) {
+                showToast('Sorry, this slot just got filled up. Please choose another time.', 'error');
+                closeModal();
+                loadSchedule();
+                return;
+            }
             
             const schoolValue = document.getElementById('studentSchool').value;
             const finalSchool = schoolValue === 'Others' 
@@ -1262,7 +1349,7 @@
             const booking = {
                 name: document.getElementById('studentName').value,
                 studentId: document.getElementById('studentId').value,
-                email: document.getElementById('studentEmail').value,
+                email: userEmail,
                 school: finalSchool,
                 course: document.getElementById('studentCourse').value,
                 year: document.getElementById('studentYear').value,
@@ -1271,13 +1358,13 @@
                 timestamp: new Date().toISOString()
             };
             
-            // Save to sheets
+          
             await saveToSheets(bookingKey, booking);
             
-            // Close booking modal
+        
             closeModal();
             
-            // Show confirmation modal
+          
             showConfirmation({
                 ...booking,
                 day: day,
@@ -1286,11 +1373,11 @@
             });
         });
 
-        // Initialize on load
+  
         window.addEventListener('DOMContentLoaded', function() {
             loadSchedule();
             
-            // Auto-refresh every 60 seconds
+       
             setInterval(() => {
                 loadFromSheets(true).then(() => loadSchedule());
             }, 60000);
@@ -1300,7 +1387,7 @@
             loadSchedule();
         });
 
-        // Close modal when clicking outside
+      
         window.addEventListener('click', function(e) {
             if (e.target === document.getElementById('bookingModal')) {
                 closeModal();
@@ -1311,7 +1398,7 @@
         });
 
         function addSpaceDecorations() {
-            // Only add decorations on desktop for performance
+    
             if (window.innerWidth > 768) {
                 for (let i = 0; i < 20; i++) {
                     const star = document.createElement('div');
