@@ -819,13 +819,9 @@
         
         <div class="description">
             <h3>About Startup Exchange</h3>
-            <p>An interactive networking experience inspired by the World Café model, designed to connect students with the startup and venture capital world. Through a series of rotating, small-group conversations, students will:</p>
-            <ul style="margin: 10px 0 0 20px;">
-                <li>Learn firsthand about the realities of launching and growing startups</li>
-                <li>Explore career paths and job opportunities in the startup ecosystem</li>
-                <li>Gain feedback and insights that can shape their own entrepreneurial ideas</li>
-            </ul>
-            <p style="margin-top: 10px;">Each table hosts a unique theme—ranging from early-stage challenges to scaling strategies, investing, and startup careers—creating space for open dialogue, practical advice, and authentic connections between students, founders, and investors.</p>
+            <p>Instead of traditional career fair booths, sit down for 20 minutes and have conversations with startup founders and venture capitalists.
+            Ask about startup culture, pitch your ideas, get insider career advice, or explore potential collaborations—all in a casual, conversational setting.
+            Whether you’re a techie looking for your next project or a business mind searching for a co-founder, Startup Exchange is your chance to network, learn, and spark new ventures—one conversation at a time.</p>
             <p style="margin-top: 10px; color: #fbbf24 !important; font-weight: 600;">📢 Note: Each time slot can accommodate up to 5 students per company table</p>
         </div>
         
@@ -1226,9 +1222,9 @@
                         if (bookingCount >= MAX_BOOKINGS_PER_SLOT) {
                             html += `<span class="slots-full">✗ Full (${bookingCount}/${MAX_BOOKINGS_PER_SLOT})</span>`;
                         } else if (bookingCount > 0) {
-                            html += `<span class="slots-partial">⚬ ${slotsRemaining} left (${bookingCount}/${MAX_BOOKINGS_PER_SLOT})</span>`;
+                            html += `<span class="slots-partial">⚬ ${slotsRemaining} seats left (${bookingCount}/${MAX_BOOKINGS_PER_SLOT})</span>`;
                         } else {
-                            html += `<span class="slots-available">✓ Available (${MAX_BOOKINGS_PER_SLOT} slots)</span>`;
+                            html += `<span class="slots-available">✓ Available (${MAX_BOOKINGS_PER_SLOT} seats)</span>`;
                         }
                         
                         html += `</div>`;
@@ -1292,7 +1288,7 @@
            
             const slotsRemainingDiv = document.getElementById('slotsRemaining');
             slotsRemainingDiv.style.display = 'block';
-            slotsRemainingDiv.textContent = `${slotsRemaining} out of ${MAX_BOOKINGS_PER_SLOT} slots remaining`;
+            slotsRemainingDiv.textContent = `${slotsRemaining} out of ${MAX_BOOKINGS_PER_SLOT} seats remaining`;
             
             document.getElementById('bookingModal').style.display = 'flex';
             document.getElementById('bookingForm').dataset.bookingKey = bookingKey;
