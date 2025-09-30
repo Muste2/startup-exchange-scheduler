@@ -988,6 +988,7 @@
                 { name: "GenTech AI", type: "startup", table: 6 },
                 { name: "Urban Farm Tech", type: "startup", table: 7 },
                 { name: "Gobi Partners", type: "vc", table: 8 },
+                { name: "Semart", type: "startup", table: 12 },
                 { name: "ourteam.ai", type: "startup", table: 12 }
             ],
             day2: [
@@ -1001,7 +1002,7 @@
                 { name: "AIngineer", type: "startup", table: 8 },
                 { name: "Urban Farm Tech", type: "startup", table: 9 },
                 { name: "Gobi Partners", type: "vc", table: 10 },
-                { name: "semart", type: "startup", table: 12 },
+                { name: "Semart", type: "startup", table: 12 },
                 { name: "ourteam.ai", type: "startup", table: 13 }
             ]
         };
@@ -1308,7 +1309,7 @@
             document.getElementById('bookingForm').dataset.bookingKey = bookingKey;
             document.getElementById('bookingForm').dataset.day = day;
             document.getElementById('bookingForm').dataset.slotIndex = slotIndex;
-            document.getElementById('bookingForm').dataset.table = getTableDisplay(tableNumber);
+            document.getElementById('bookingForm').dataset.table = tableNumber;
         }
 
         function closeModal() {
@@ -1442,6 +1443,7 @@
     </script>
 </body>
 </html>
+
 
 
 
