@@ -978,28 +978,28 @@
       
         const companies = {
             day1: [
-                { name: "TheHive Sea", type: "vc", table: 1 },
+                { name: "The Hive SEA", type: "vc", table: 1 },
                 { name: "Sunway iLabs", type: "vc", table: 2 },
-                { name: "Arclab", type: "startup", table: 3 },
+                { name: "ArcLab", type: "startup", table: 3 },
                 { name: "Growth Charger", type: "vc", table: 4 },
-                { name: "AI engineer", type: "startup", table: 5 },
-                { name: "gentech AI", type: "startup", table: 6 },
+                { name: "AIngineer", type: "startup", table: 5 },
+                { name: "GenTech AI", type: "startup", table: 6 },
                 { name: "Urban Farm Tech", type: "startup", table: 7 },
                 { name: "Gobi Partners", type: "vc", table: 8 },
-                { name: "Ourteam.ai", type: "startup", table: "12" }
+                { name: "ourteam.ai", type: "startup", table: 12 }
             ],
             day2: [
                 { name: "Aonic", type: "startup", table: 1 },
-                { name: "TheHive Sea", type: "vc", table: 2 },
+                { name: "The Hive SEA", type: "vc", table: 2 },
                 { name: "Sunway iLabs", type: "vc", table: 3 },
                 { name: "SpeedHome", type: "startup", table: 4 },
                 { name: "Growth Charger", type: "vc", table: 5 },
-                { name: "Aurellia", type: "startup", table: 6 },
+                { name: "auRELIA", type: "startup", table: 6 },
                 { name: "Buzz", type: "startup", table: 7 },
-                { name: "AI engineer", type: "startup", table: 8 },
+                { name: "AIngineer", type: "startup", table: 8 },
                 { name: "Urban Farm Tech", type: "startup", table: 9 },
                 { name: "Gobi Partners", type: "vc", table: 10 },
-                { name: "Ourteam.ai", type: "startup", table: "12" }
+                { name: "ourteam.ai", type: "startup", table: "Careerhub" }
             ]
         };
 
@@ -1127,7 +1127,7 @@
             try {
                 const [day, slotIndex, table] = bookingKey.split('_');
                 const companyList = companies[day];
-                const company = companyList.find(c => c.table === parseInt(table));
+                const company = companyList.find(c => c.table == table);
                 const companyName = company ? company.name : '';
                 
                 booking.company = companyName;
@@ -1196,6 +1196,18 @@
                 } else {
                     
                     companyList.forEach(company => {
+                        if (day === 'day2' && company.name === 'Buzz') {
+                            const [startTime] = slot.split(' - ');
+                            const [hours] = startTime.split(':').map(Number);
+                            if (hours < 13) {
+                                html += `<td class="company-slot" style="background: linear-gradient(135deg, rgba(40, 40, 40, 0.8) 0%, rgba(60, 60, 60, 0.8) 100%); color: #888; cursor: not-allowed;">
+                                            <div class="company-name">${company.name}</div>
+                                            <div class="company-type ${company.type}">${company.type.toUpperCase()}</div>
+                                            <div style="font-size: 0.75em; color: #999;">Available after 1:00 PM</div>
+                                        </td>`;
+                                return;
+                            }
+                        }
                         const bookingKey = `${day}_${slotIndex}_${company.table}`;
                         const currentBookings = bookingsCache[bookingKey] || [];
                         const bookingCount = currentBookings.length;
@@ -1265,7 +1277,7 @@
 
         function openBookingModal(day, slotIndex, tableNumber) {
             const companyList = companies[day];
-            const company = companyList.find(c => c.table === tableNumber);
+            const company = companyList.find(c => c.table == tableNumber);
             const timeSlots = getTimeSlots();
             const bookingKey = `${day}_${slotIndex}_${tableNumber}`;
             const currentBookings = bookingsCache[bookingKey] || [];
@@ -1308,7 +1320,7 @@
             const slotIndex = bookingData.slotIndex;
             const tableNumber = bookingData.table;
             const companyList = companies[day];
-            const company = companyList.find(c => c.table === parseInt(tableNumber));
+            const company = companyList.find(c => c.table == tableNumber);
             const timeSlots = getTimeSlots();
             const dateStr = day === 'day1' ? 'October 2' : 'October 3';
             
@@ -1427,6 +1439,7 @@
     </script>
 </body>
 </html>
+
 
 
 
