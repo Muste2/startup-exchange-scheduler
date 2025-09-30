@@ -974,7 +974,9 @@
     <script>
         const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxCTeH_jAJeFyZyU99WSHrVL8SlRibgaFzZSJKMTSfwRQGmitWtFqQqfpXgoSvY1PBN/exec';
         const MAX_BOOKINGS_PER_SLOT = 5; 
-        
+        function getTableDisplay(tableNumber) {
+            return tableNumber === 13 ? "Careerhub" : tableNumber;
+            }
       
         const companies = {
             day1: [
@@ -999,7 +1001,8 @@
                 { name: "AIngineer", type: "startup", table: 8 },
                 { name: "Urban Farm Tech", type: "startup", table: 9 },
                 { name: "Gobi Partners", type: "vc", table: 10 },
-                { name: "ourteam.ai", type: "startup", table: "Careerhub" }
+                { name: "semart", type: "startup", table: 12 },
+                { name: "ourteam.ai", type: "startup", table: 13 }
             ]
         };
 
@@ -1175,7 +1178,7 @@
             html += '<thead><tr><th>Time Slot</th>';
             
             companyList.forEach(company => {
-                html += `<th>Table ${company.table}</th>`;
+                html += `<th>Table ${getTableDisplay(company.table)}</th>`;
             });
             html += '</tr></thead><tbody>';
             
@@ -1294,7 +1297,7 @@
                 `<strong>Company:</strong> ${company.name}<br>
                  <strong>Date:</strong> ${dateStr}<br>
                  <strong>Time:</strong> ${timeSlots[slotIndex]}<br>
-                 <strong>Table:</strong> ${tableNumber}`;
+                  <strong>Table:</strong> ${getTableDisplay(tableNumber)}`;
                  
            
             const slotsRemainingDiv = document.getElementById('slotsRemaining');
@@ -1305,7 +1308,7 @@
             document.getElementById('bookingForm').dataset.bookingKey = bookingKey;
             document.getElementById('bookingForm').dataset.day = day;
             document.getElementById('bookingForm').dataset.slotIndex = slotIndex;
-            document.getElementById('bookingForm').dataset.table = tableNumber;
+            document.getElementById('bookingForm').dataset.table = getTableDisplay(tableNumber);
         }
 
         function closeModal() {
@@ -1327,7 +1330,7 @@
             document.getElementById('confirmDate').textContent = dateStr;
             document.getElementById('confirmTime').textContent = timeSlots[slotIndex];
             document.getElementById('confirmCompany').textContent = company.name;
-            document.getElementById('confirmTable').textContent = tableNumber;
+            document.getElementById('confirmTable').textContent = getTableDisplay(tableNumber);
             document.getElementById('confirmName').textContent = bookingData.name;
             document.getElementById('confirmId').textContent = bookingData.studentId;
             document.getElementById('confirmSchool').textContent = bookingData.school;
